@@ -23,5 +23,5 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "TakeHomeDemo"
+includeBuild("build-logic")
 include(":app")
- 

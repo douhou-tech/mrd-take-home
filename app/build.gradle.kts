@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
-}
+    alias(libs.plugins.mrd.android.build.environments)}
 
 android {
     namespace = "com.mrd.restaurant.discovery"
