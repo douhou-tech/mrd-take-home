@@ -2,14 +2,17 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.mrd.android.build.environments)}
+    alias(libs.plugins.mrd.android.build.environments)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics)
+}
 
 android {
-    namespace = "com.mrd.restaurant.discovery"
+    namespace = "com.mrd.restaurant.discovery.demo"
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "com.mrd.restaurant.discovery"
+        applicationId = "com.mrd.restaurant.discovery.demo"
         minSdk = 28
         targetSdk = 37
         versionCode = 1
@@ -57,6 +60,11 @@ dependencies {
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
 
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.remote.config)
+    implementation(libs.firebase.crashlytics)
+
     // Testing
     testImplementation(libs.junit)
     testImplementation(libs.mockk)
@@ -69,7 +77,6 @@ dependencies {
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)

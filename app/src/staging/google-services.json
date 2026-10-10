@@ -1,0 +1,67 @@
+{
+  "project_info": {
+    "project_number": "1006945134743",
+    "project_id": "mrd-restaurant-discovery",
+    "storage_bucket": "mrd-restaurant-discovery.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1006945134743:android:8649612b6b86921105e1d2",
+        "android_client_info": {
+          "package_name": "com.mrd.restaurant.discovery.demo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCrv1d4-O9IRj2HyGO0SWkLt3Bi2B2RDXY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1006945134743:android:1a2197ffb65d4c6205e1d2",
+        "android_client_info": {
+          "package_name": "com.mrd.restaurant.discovery.demo.dev"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCrv1d4-O9IRj2HyGO0SWkLt3Bi2B2RDXY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1006945134743:android:13ea09044d1e30f105e1d2",
+        "android_client_info": {
+          "package_name": "com.mrd.restaurant.discovery.demo.staging"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCrv1d4-O9IRj2HyGO0SWkLt3Bi2B2RDXY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
