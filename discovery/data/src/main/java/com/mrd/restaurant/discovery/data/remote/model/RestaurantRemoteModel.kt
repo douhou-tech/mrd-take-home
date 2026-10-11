@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 data class RestaurantRemoteModel(
     @SerialName("id") val id: String = "",
     @SerialName("name") val name: String = "",
+    @SerialName("location") val location: String = "",
     @SerialName("cuisines") val cuisines: String = "",
     @SerialName("rating") val rating: Double = 0.0,
     @SerialName("delivery_fee_in_cents") val deliveryFeeInCents: Double = 0.0,

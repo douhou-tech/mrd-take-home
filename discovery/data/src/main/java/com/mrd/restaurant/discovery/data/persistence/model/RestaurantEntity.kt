@@ -8,6 +8,7 @@ import androidx.room.PrimaryKey
 data class RestaurantEntity(
     @PrimaryKey val id: String = "",
     val name: String = "",
+    val location: String = "",
     val cuisines: String = "",
     val rating: Double = 0.0,
     val deliveryFeeInCents: Double = 0.0,

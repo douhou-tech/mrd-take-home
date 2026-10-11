@@ -10,6 +10,7 @@ internal object RestaurantsMapper {
         return Restaurant(
             id = id,
             name = name,
+            location = location,
             cuisines = cuisines,
             rating = rating,
             deliveryFeeInCents = deliveryFeeInCents,
@@ -23,6 +24,7 @@ internal object RestaurantsMapper {
         return RestaurantEntity(
             id = id,
             name = name,
+            location = location,
             cuisines = cuisines,
             rating = rating,
             deliveryFeeInCents = deliveryFeeInCents,
@@ -36,6 +38,7 @@ internal object RestaurantsMapper {
         return Restaurant(
             id = id,
             name = name,
+            location = location,
             cuisines = cuisines,
             rating = rating,
             deliveryFeeInCents = deliveryFeeInCents,

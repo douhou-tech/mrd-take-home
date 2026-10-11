@@ -22,7 +22,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -36,90 +35,132 @@ fun RestaurantDiscoveryScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(16.dp)
+                .padding(Dimens.SpacingMedium)
         ) {
-            OutlinedTextField(
-                value = uiState.query,
-                onValueChange = {
+            RestaurantSearchBox(
+                query = uiState.query,
+                onQueryChanged = {
                     viewModel.onIntent(RestaurantDiscoveryIntent.SearchQueryChanged(it))
-                },
-                label = { Text("Search restaurants...") },
-                modifier = Modifier.fillMaxWidth()
+                }
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(Dimens.SpacingSmall))
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Open Now", modifier = Modifier.weight(1f))
-                Switch(
-                    checked = uiState.isOpenNow,
-                    onCheckedChange = {
-                        viewModel.onIntent(RestaurantDiscoveryIntent.ToggleOpenNow(it))
-                    }
-                )
-            }
+            RestaurantFilterSection(
+                isOpenNow = uiState.isOpenNow,
+                onToggleOpenNow = {
+                    viewModel.onIntent(RestaurantDiscoveryIntent.ToggleOpenNow(it))
+                }
+            )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(Dimens.SpacingMedium))
 
             when (val state = uiState) {
-                is RestaurantDiscoveryUiState.Loading -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator()
-                    }
-                }
-                is RestaurantDiscoveryUiState.Empty -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("No restaurants found.")
-                    }
-                }
-                is RestaurantDiscoveryUiState.Error -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("Error: ${state.message}")
-                    }
-                }
-                is RestaurantDiscoveryUiState.Success -> {
-                    Column(modifier = Modifier.fillMaxSize()) {
-                        LazyColumn(modifier = Modifier.weight(1f)) {
-                            items(state.restaurants, key = { it.id }) { restaurant ->
-                                Column(modifier = Modifier.padding(vertical = 8.dp)) {
-                                    Text(text = restaurant.name, style = MaterialTheme.typography.titleMedium)
-                                    Text(text = restaurant.cuisines, style = MaterialTheme.typography.bodyMedium)
-                                    Text(
-                                        text = "Rating: ${restaurant.rating} ⭐ | ETA: ${restaurant.etaMinutes} mins",
-                                        style = MaterialTheme.typography.bodySmall
-                                    )
-                                }
-                            }
-                        }
+                is RestaurantDiscoveryUiState.Loading -> LoadingResultsContent()
+                is RestaurantDiscoveryUiState.Empty -> EmptyResultsContent()
+                is RestaurantDiscoveryUiState.Error -> ErrorResultsContent(message = state.message)
+                is RestaurantDiscoveryUiState.Success -> SuccessResultsContent(
+                    state = state,
+                    onPreviousPage = { viewModel.onIntent(RestaurantDiscoveryIntent.PreviousPage) },
+                    onNextPage = { viewModel.onIntent(RestaurantDiscoveryIntent.NextPage) }
+                )
+            }
+        }
+    }
+}
 
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Button(
-                                onClick = { viewModel.onIntent(RestaurantDiscoveryIntent.PreviousPage) },
-                                enabled = state.currentPage > 0
-                            ) {
-                                Text("Previous")
-                            }
-                            Spacer(modifier = Modifier.weight(1f))
-                            val totalPages = (state.totalCount + state.pageSize - 1) / state.pageSize
-                            Text("Page ${state.currentPage + 1} of $totalPages")
-                            Spacer(modifier = Modifier.weight(1f))
-                            Button(
-                                onClick = { viewModel.onIntent(RestaurantDiscoveryIntent.NextPage) },
-                                enabled = (state.currentPage + 1) * state.pageSize < state.totalCount
-                            ) {
-                                Text("Next")
-                            }
-                        }
-                    }
+@Composable
+private fun RestaurantSearchBox(
+    query: String,
+    onQueryChanged: (String) -> Unit,
+) {
+    OutlinedTextField(
+        value = query,
+        onValueChange = onQueryChanged,
+        label = { Text("Search restaurants...") },
+        modifier = Modifier.fillMaxWidth(),
+    )
+}
+
+@Composable
+private fun RestaurantFilterSection(
+    isOpenNow: Boolean,
+    onToggleOpenNow: (Boolean) -> Unit,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Text("Open Now", modifier = Modifier.weight(1f))
+        Switch(
+            checked = isOpenNow,
+            onCheckedChange = onToggleOpenNow
+        )
+    }
+}
+
+@Composable
+private fun EmptyResultsContent() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Text("No restaurants found.")
+    }
+}
+
+@Composable
+private fun LoadingResultsContent() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        CircularProgressIndicator()
+    }
+}
+
+@Composable
+private fun ErrorResultsContent(message: String) {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Text("Error: $message")
+    }
+}
+
+@Composable
+private fun SuccessResultsContent(
+    state: RestaurantDiscoveryUiState.Success,
+    onPreviousPage: () -> Unit,
+    onNextPage: () -> Unit,
+) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(modifier = Modifier.weight(1f)) {
+            items(state.restaurants, key = { it.id }) { restaurant ->
+                Column(modifier = Modifier.padding(vertical = Dimens.SpacingSmall)) {
+                    Text(text = restaurant.displayName(), style = MaterialTheme.typography.titleMedium)
+                    Text(text = restaurant.cuisines, style = MaterialTheme.typography.bodyMedium)
+                    Text(
+                        text = "Rating: ${restaurant.rating} ⭐ | ETA: ${restaurant.etaMinutes} mins",
+                        style = MaterialTheme.typography.bodySmall
+                    )
                 }
+            }
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = Dimens.SpacingSmall),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Button(
+                onClick = onPreviousPage,
+                enabled = state.currentPage > 0
+            ) {
+                Text("Previous")
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            val totalPages = ((state.totalCount + state.pageSize - 1) / state.pageSize)
+            Text("Page ${state.currentPage + 1} of $totalPages")
+            Spacer(modifier = Modifier.weight(1f))
+            Button(
+                onClick = onNextPage,
+                enabled = (state.currentPage + 1) * state.pageSize < state.totalCount
+            ) {
+                Text("Next")
             }
         }
     }
