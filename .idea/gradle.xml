@@ -22,6 +22,11 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/build-logic" />
+            <option value="$PROJECT_DIR$/discovery" />
+            <option value="$PROJECT_DIR$/discovery/core" />
+            <option value="$PROJECT_DIR$/discovery/data" />
+            <option value="$PROJECT_DIR$/discovery/domain" />
+            <option value="$PROJECT_DIR$/discovery/feature" />
           </set>
         </option>
       </GradleProjectSettings>
