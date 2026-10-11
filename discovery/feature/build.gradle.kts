@@ -25,9 +25,13 @@ android {
 }
 
 dependencies {
+    implementation(project(":discovery:core:primitives"))
+    implementation(project(":discovery:domain"))
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
     implementation(libs.material)
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
