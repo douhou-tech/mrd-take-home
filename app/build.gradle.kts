@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.mrd.android.build.environments)
+    alias(libs.plugins.mrd.android.compose)
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
 }
@@ -40,15 +41,6 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.ui.graphics)
-    implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.compose.material3)
-
     // Ktor
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.okhttp)
@@ -63,6 +55,7 @@ dependencies {
     implementation(project(":discovery:core:primitives"))
     implementation(project(":discovery:domain"))
     implementation(project(":discovery:data"))
+    implementation(project(":discovery:feature"))
 
     // Timber
     implementation(libs.timber)
@@ -72,6 +65,7 @@ dependencies {
     implementation(libs.firebase.remote.config)
     implementation(libs.firebase.crashlytics)
 
+    // TODO move to convention plugin
     // Testing
     testImplementation(libs.junit)
     testImplementation(libs.mockk)

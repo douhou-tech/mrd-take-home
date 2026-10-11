@@ -24,5 +24,9 @@ gradlePlugin {
             id = "mrd.android.database"
             implementationClass = "DatabaseConventionPlugin"
         }
+        create("androidCompose") {
+            id = "mrd.android.compose"
+            implementationClass = "ComposeConventionPlugin"
+        }
     }
 }

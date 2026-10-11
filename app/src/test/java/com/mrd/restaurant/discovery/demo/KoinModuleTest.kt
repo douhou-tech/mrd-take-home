@@ -4,6 +4,7 @@ import android.content.Context
 import com.mrd.restaurant.diiscovery.domain.di.restaurantDiscoveryDomainModule
 import com.mrd.restaurant.diiscovery.domain.usecase.FilterRestaurantsUseCase
 import com.mrd.restaurant.discovery.data.di.restaurantDiscoveryDataModule
+import com.mrd.restaurant.discovery.demo.di.appModule
 import io.mockk.mockk
 import org.junit.Test
 import org.koin.android.ext.koin.androidContext
@@ -18,7 +19,7 @@ class KoinModuleTest : KoinTest {
         val mockContext = mockk<Context>(relaxed = true)
         val koinApp = koinApplication {
             androidContext(mockContext)
-            modules(restaurantDiscoveryDomainModule, restaurantDiscoveryDataModule)
+            modules(appModule, restaurantDiscoveryDomainModule, restaurantDiscoveryDataModule)
         }
 
         val useCase = koinApp.koin.get<FilterRestaurantsUseCase>()

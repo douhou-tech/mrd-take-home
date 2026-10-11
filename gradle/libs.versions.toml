@@ -93,3 +93,4 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 mrd-android-build-environments = { id = "mrd.android.build.environments" }
 mrd-kotlin-unit-tests = { id = "mrd.kotlin.unit.tests" }
 mrd-android-database = { id = "mrd.android.database" }
+mrd-android-compose = { id = "mrd.android.compose" }
