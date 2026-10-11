@@ -6,7 +6,7 @@ import com.mrd.restaurant.diiscovery.domain.repository.RestaurantFilters
 import com.mrd.restaurant.diiscovery.domain.repository.RestaurantsRepository
 import com.mrd.restaurant.discovery.core.primitive.model.EitherResult
 import com.mrd.restaurant.discovery.core.primitive.model.Pagination
-import com.mrd.restaurant.discovery.core.primitive.model.PaginationResult
+import com.mrd.restaurant.discovery.core.primitive.model.PagedResult
 import io.kotest.matchers.equals.shouldBeEqual
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -50,7 +50,7 @@ class FilterRestaurantsUseCaseTest : KoinTest {
     fun `when invoke and success then success result should be returned`() = runTest {
         val filters = RestaurantFilters()
         val pagination = mockk<Pagination>()
-        val data = mockk<PaginationResult<Restaurant>>()
+        val data = mockk<PagedResult<Restaurant>>()
         coEvery { restaurantsRepository.filterRestaurants(eq(filters), eq(pagination)) } returns data
 
         val actual = subject(filters, pagination)

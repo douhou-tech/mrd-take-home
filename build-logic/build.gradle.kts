@@ -20,5 +20,9 @@ gradlePlugin {
             id = "mrd.kotlin.unit.tests"
             implementationClass = "KotlinTestConventionPlugin"
         }
+        create("androidLocalDatabase") {
+            id = "mrd.android.database"
+            implementationClass = "DatabaseConventionPlugin"
+        }
     }
 }

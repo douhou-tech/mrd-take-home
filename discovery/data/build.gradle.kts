@@ -1,5 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
+    alias(libs.plugins.mrd.android.database)
+    alias(libs.plugins.mrd.kotlin.unit.tests)
 }
 
 android {
@@ -21,10 +23,6 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.material)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(libs.androidx.junit)
+    implementation(project(":discovery:core:primitives"))
+    implementation(project(":discovery:domain"))
 }

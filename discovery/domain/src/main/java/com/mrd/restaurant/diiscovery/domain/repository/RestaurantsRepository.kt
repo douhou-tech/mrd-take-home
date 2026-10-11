@@ -2,14 +2,14 @@ package com.mrd.restaurant.diiscovery.domain.repository
 
 import com.mrd.restaurant.diiscovery.domain.model.Restaurant
 import com.mrd.restaurant.discovery.core.primitive.model.Pagination
-import com.mrd.restaurant.discovery.core.primitive.model.PaginationResult
+import com.mrd.restaurant.discovery.core.primitive.model.PagedResult
 
 interface RestaurantsRepository {
 
     suspend fun filterRestaurants(
         filters: RestaurantFilters,
         pagination: Pagination
-    ): PaginationResult<Restaurant>
+    ): PagedResult<Restaurant>
 
 }
 

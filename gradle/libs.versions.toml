@@ -19,6 +19,8 @@ crashlytics = "3.0.8"
 appcompat = "1.8.0"
 material = "1.14.0"
 jetbrainsKotlinJvm = "2.4.21"
+room = "2.8.5"
+ksp = "2.0.21-1.0.25"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -46,7 +48,13 @@ koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", versi
 koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin" }
 koin-test-junit4 = { module = "io.insert-koin:koin-test-junit4", version.ref = "koin" }
 
-# Test dependencies
+# Room
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+androidx-room-testing = { module = "androidx.room:room-testing", version.ref = "room" }
+
+# Test dependencies (core)
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -73,7 +81,10 @@ google-services = { id = "com.google.gms.google-services", version.ref = "google
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "crashlytics" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
+room = { id = "androidx.room", version.ref = "room" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 
 # Local plugin (build environments)
 mrd-android-build-environments = { id = "mrd.android.build.environments" }
 mrd-kotlin-unit-tests = { id = "mrd.kotlin.unit.tests" }
+mrd-android-database = { id = "mrd.android.database" }

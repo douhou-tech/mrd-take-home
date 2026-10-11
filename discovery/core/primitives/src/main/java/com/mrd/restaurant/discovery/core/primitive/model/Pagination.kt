@@ -5,9 +5,9 @@ data class Pagination(
     val pageSize: Int
 )
 
-data class PaginationResult<TData>(
+data class PagedResult<TData>(
     val items: List<TData> = emptyList(),
     val pageSize: Int = 0,
     val currentPage: Int = 0,
-    val totalPages: Int = 0
+    val totalCount: Int = 0
 )
