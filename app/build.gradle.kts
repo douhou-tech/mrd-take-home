@@ -70,8 +70,6 @@ dependencies {
     testImplementation(libs.mockk)
     testImplementation(libs.kotest.assertions.core)
     testImplementation(libs.kotlinx.coroutines.test)
-    
-    // Koin Test Setup
     testImplementation(libs.koin.test)
     testImplementation(libs.koin.test.junit4)
 

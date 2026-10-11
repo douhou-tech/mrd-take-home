@@ -71,7 +71,9 @@ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "ko
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "crashlytics" }
-# Local plugin (build environments)
-mrd-android-build-environments = { id = "mrd.android.build.environments" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
+
+# Local plugin (build environments)
+mrd-android-build-environments = { id = "mrd.android.build.environments" }
+mrd-kotlin-unit-tests = { id = "mrd.kotlin.unit.tests" }

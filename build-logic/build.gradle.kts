@@ -16,5 +16,9 @@ gradlePlugin {
             id = "mrd.android.build.environments"
             implementationClass = "AndroidBuildEnvironmentsConventionPlugin"
         }
+        create("kotlinUnitTests") {
+            id = "mrd.kotlin.unit.tests"
+            implementationClass = "KotlinTestConventionPlugin"
+        }
     }
 }

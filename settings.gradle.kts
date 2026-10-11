@@ -25,7 +25,7 @@ dependencyResolutionManagement {
 rootProject.name = "TakeHomeDemo"
 includeBuild("build-logic")
 include(":app")
+include(":discovery:core:primitives")
 include(":discovery:domain")
-include(":discovery:core")
 include(":discovery:data")
 include(":discovery:feature")
