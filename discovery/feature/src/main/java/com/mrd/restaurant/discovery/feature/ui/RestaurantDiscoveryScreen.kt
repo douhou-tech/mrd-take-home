@@ -1,13 +1,22 @@
 package com.mrd.restaurant.discovery.feature.ui
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
@@ -22,6 +31,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
+import com.mrd.restaurant.diiscovery.domain.model.Restaurant
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -129,14 +146,9 @@ private fun SuccessResultsContent(
     Column(modifier = Modifier.fillMaxSize()) {
         LazyColumn(modifier = Modifier.weight(1f)) {
             items(state.restaurants, key = { it.id }) { restaurant ->
-                Column(modifier = Modifier.padding(vertical = Dimens.SpacingSmall)) {
-                    Text(text = restaurant.displayName(), style = MaterialTheme.typography.titleMedium)
-                    Text(text = restaurant.cuisines, style = MaterialTheme.typography.bodyMedium)
-                    Text(
-                        text = "Rating: ${restaurant.rating} ⭐ | ETA: ${restaurant.etaMinutes} mins",
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
+                RestaurantItem(
+                    restaurant = restaurant
+                )
             }
         }
 
@@ -164,4 +176,62 @@ private fun SuccessResultsContent(
             }
         }
     }
+}
+
+@Composable
+fun RestaurantItem(restaurant: Restaurant) {
+
+    Column(modifier = Modifier.padding(vertical = Dimens.SpacingSmall)) {
+        RestaurantImage(
+            imageUrl = restaurant.imageUrl
+        )
+        Text(text = restaurant.displayName(), style = MaterialTheme.typography.titleMedium)
+        Text(text = restaurant.cuisines, style = MaterialTheme.typography.bodyMedium)
+        Text(
+            text = "Rating: ${restaurant.rating} ⭐ | ETA: ${restaurant.etaMinutes} mins",
+            style = MaterialTheme.typography.bodySmall
+        )
+    }
+
+}
+
+@Composable
+fun RestaurantImage(imageUrl: String) {
+    AsyncImage(
+        model = imageUrl,
+        contentDescription = null,
+        contentScale = ContentScale.Crop,
+        modifier = Modifier
+            .shimmerEffect()
+            .fillMaxWidth()
+            .aspectRatio(16f / 9f)
+            .height(150.dp)
+    )
+}
+
+fun Modifier.shimmerEffect(): Modifier = composed {
+    val transition = rememberInfiniteTransition(label = "ShimmerTransition")
+    val translateAnim = transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1000f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "ShimmerAnim"
+    )
+
+    val shimmerColors = listOf(
+        Color.LightGray.copy(alpha = 0.6f),
+        Color.LightGray.copy(alpha = 0.2f),
+        Color.LightGray.copy(alpha = 0.6f)
+    )
+
+    background(
+        brush = Brush.linearGradient(
+            colors = shimmerColors,
+            start = Offset.Zero,
+            end = Offset(x = translateAnim.value, y = translateAnim.value)
+        )
+    )
 }
