@@ -1,6 +1,7 @@
 package com.mrd.restaurant.diiscovery.domain.usecase
 
 import com.mrd.restaurant.diiscovery.domain.model.Restaurant
+import com.mrd.restaurant.diiscovery.domain.repository.RestaurantFilter
 import com.mrd.restaurant.diiscovery.domain.repository.RestaurantFilters
 import com.mrd.restaurant.diiscovery.domain.repository.RestaurantsRepository
 import com.mrd.restaurant.discovery.core.primitive.model.EitherResult
@@ -16,11 +17,28 @@ class FilterRestaurantsUseCase(
         pagination: Pagination
     ): EitherResult<PaginationResult<Restaurant>, Error> {
         return try {
-            val result = restaurantsRepository.filterRestaurants(filters, pagination)
+            val sanitizedFilters = filters.filters.map {
+                when (it) {
+                    is RestaurantFilter.Query -> it.sanitize()
+                    else -> it
+                }
+            }.toSet()
+            val result = restaurantsRepository.filterRestaurants(
+                filters = RestaurantFilters(sanitizedFilters),
+                pagination = pagination
+            )
             EitherResult.Success(result)
         } catch (_: Exception) {
             EitherResult.Error(Error.Unknown)
         }
+    }
+
+    private fun RestaurantFilter.Query.sanitize(): RestaurantFilter.Query {
+        val query = this.query
+            .trim()
+            .lowercase()
+            .replace(Regex("\\s+"), " ")
+        return RestaurantFilter.Query(query)
     }
 
     sealed interface Error {
