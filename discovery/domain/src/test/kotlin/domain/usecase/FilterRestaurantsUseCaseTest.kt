@@ -1,8 +1,13 @@
 package com.mrd.restaurant.diiscovery.domain.usecase
 
+import com.mrd.restaurant.diiscovery.domain.model.Restaurant
 import com.mrd.restaurant.diiscovery.domain.repository.RestaurantFilters
 import com.mrd.restaurant.diiscovery.domain.repository.RestaurantsRepository
+import com.mrd.restaurant.discovery.core.primitive.model.EitherResult
 import com.mrd.restaurant.discovery.core.primitive.model.Pagination
+import com.mrd.restaurant.discovery.core.primitive.model.PaginationResult
+import io.kotest.matchers.equals.shouldBeEqual
+import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
@@ -12,16 +17,28 @@ import org.koin.test.KoinTest
 class FilterRestaurantsUseCaseTest : KoinTest {
 
     val restaurantsRepository = mockk<RestaurantsRepository>()
-    val filterRestaurantsUseCase = FilterRestaurantsUseCase(restaurantsRepository)
+    val subject = FilterRestaurantsUseCase(restaurantsRepository)
 
     @Test
     fun `when invoke then call repository should be called with correct parameters`() = runTest {
         val filters = mockk<RestaurantFilters>()
         val pagination = mockk<Pagination>()
 
-        filterRestaurantsUseCase(filters, pagination)
+        subject(filters, pagination)
 
         coVerify { restaurantsRepository.filterRestaurants(eq(filters), eq(pagination)) }
+    }
+
+    @Test
+    fun `when invoke then return success with correct result`() = runTest {
+        val filters = mockk<RestaurantFilters>()
+        val pagination = mockk<Pagination>()
+        val data = mockk<PaginationResult<Restaurant>>()
+        coEvery { restaurantsRepository.filterRestaurants(eq(filters), eq(pagination)) } returns data
+
+        val actual = subject(filters, pagination)
+
+        actual shouldBeEqual EitherResult.Success(data)
     }
 
 }
