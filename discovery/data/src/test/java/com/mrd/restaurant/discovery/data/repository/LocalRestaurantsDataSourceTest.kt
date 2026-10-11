@@ -42,6 +42,29 @@ class LocalRestaurantsDataSourceTest {
         }
     }
 
+    @Test
+    fun `when getRestaurants is called with isOpen filter then dao should be called with isOpen = true`() = runTest {
+        val filters = RestaurantFilters(
+            filters = setOf(RestaurantFilter.IsOpenNow)
+        )
+        val pagination = Pagination(
+            page = Random.nextInt(0, 10),
+            pageSize = Random.nextInt(10, 50)
+        )
+
+        subject.getRestaurants(filters, pagination)
+
+
+        coVerify {
+            restaurantDao.getRestaurants(
+                query = isNull(),
+                isOpen = eq(true),
+                pageSize = eq(pagination.pageSize),
+                offset = eq(0)
+            )
+        }
+    }
+
 }
 
 class LocalRestaurantsDataSource(
