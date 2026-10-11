@@ -4,12 +4,14 @@ import com.mrd.restaurant.diiscovery.domain.model.Restaurant
 import com.mrd.restaurant.diiscovery.domain.repository.RestaurantFilter
 import com.mrd.restaurant.diiscovery.domain.repository.RestaurantFilters
 import com.mrd.restaurant.diiscovery.domain.repository.RestaurantsRepository
+import com.mrd.restaurant.discovery.core.logging.Logger
 import com.mrd.restaurant.discovery.core.primitive.model.EitherResult
 import com.mrd.restaurant.discovery.core.primitive.model.Pagination
 import com.mrd.restaurant.discovery.core.primitive.model.PagedResult
 
 class FilterRestaurantsUseCase(
-    private val restaurantsRepository: RestaurantsRepository
+    private val restaurantsRepository: RestaurantsRepository,
+    private val logger: Logger
 ) {
 
     suspend operator fun invoke(
@@ -17,18 +19,22 @@ class FilterRestaurantsUseCase(
         pagination: Pagination
     ): EitherResult<PagedResult<Restaurant>, Error> {
         return try {
+            logger.log("Filtering restaurants with filters: $filters")
             val sanitizedFilters = filters.filters.map {
                 when (it) {
                     is RestaurantFilter.Query -> it.sanitize()
                     else -> it
                 }
             }.toSet()
+            logger.log("Sanitize restaurants filters: $sanitizedFilters")
             val result = restaurantsRepository.filterRestaurants(
                 filters = RestaurantFilters(sanitizedFilters),
                 pagination = pagination
             )
+            logger.log("Filtered restaurants: $result")
             EitherResult.Success(result)
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            logger.error("Error filtering restaurants", e)
             EitherResult.Error(Error.Unknown)
         }
     }

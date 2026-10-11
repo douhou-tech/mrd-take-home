@@ -60,8 +60,12 @@ dependencies {
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
 
+    implementation(project(":discovery:core:primitives"))
     implementation(project(":discovery:domain"))
     implementation(project(":discovery:data"))
+
+    // Timber
+    implementation(libs.timber)
 
     // Firebase
     implementation(platform(libs.firebase.bom))
