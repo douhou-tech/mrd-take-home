@@ -20,7 +20,14 @@ val restaurantDiscoveryDataModule = module {
         ).build()
     }
     single { get<RestaurantDiscoveryDatabase>().restaurantDao() }
-    single { LocalRestaurantsDataSourceImpl(restaurantDao = get()) }
-    single<RemoteDataSource> { MockRemoteDataSource() }
+    single<LocalRestaurantsDataSource> { LocalRestaurantsDataSourceImpl(restaurantDao = get()) }
+    single<RemoteDataSource> {
+        val restaurantsJson = androidContext().assets.open("mocks/restaurants.json")
+            .bufferedReader()
+            .use {
+                it.readText()
+            }
+        MockRemoteDataSource(restaurantsJson)
+    }
     single<RestaurantsRepository> { RestaurantsRepositoryImpl(localDataSource = get()) }
 }

@@ -22,6 +22,7 @@ jetbrainsKotlinJvm = "2.4.21"
 room = "2.8.5"
 ksp = "2.0.21-1.0.25"
 timber = "5.0.1"
+kotlinxSerializationJson = "1.11.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -52,6 +53,9 @@ koin-test-junit4 = { module = "io.insert-koin:koin-test-junit4", version.ref = "
 
 # Timber
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
+
+# Serialization
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 
 # Room
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }

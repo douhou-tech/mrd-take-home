@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.mrd.android.database)
     alias(libs.plugins.mrd.kotlin.unit.tests)
 }
@@ -26,4 +27,5 @@ dependencies {
     implementation(project(":discovery:core:primitives"))
     implementation(project(":discovery:domain"))
     implementation(libs.koin.android)
+    implementation(libs.kotlinx.serialization.json)
 }

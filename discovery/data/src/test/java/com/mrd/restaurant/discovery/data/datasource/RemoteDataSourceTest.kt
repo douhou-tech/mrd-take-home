@@ -10,7 +10,7 @@ import kotlin.test.assertTrue
 
 class RemoteDataSourceTest {
 
-    private val subject: RemoteDataSource = MockRemoteDataSource()
+    private val subject: RemoteDataSource = MockRemoteDataSource(loadRestaurantsJson())
 
     @Test
     fun `when getRestaurants without filters then return 100 Cape Town CBD restaurants paginated`() = runTest {
@@ -65,5 +65,15 @@ class RemoteDataSourceTest {
         assertEquals(100, page0.totalCount)
         assertEquals("cpt-cbd-001", page0.items.first().id)
         assertEquals("cpt-cbd-011", page1.items.first().id)
+    }
+}
+
+private fun loadRestaurantsJson(): String {
+    return try {
+        Thread.currentThread().contextClassLoader?.getResource("mocks/restaurants.json")?.readText()
+            ?: RemoteDataSourceTest::class.java.classLoader?.getResource("mocks/restaurants.json")?.readText()
+            ?: "[]"
+    } catch (_: Exception) {
+        "[]"
     }
 }
