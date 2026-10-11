@@ -3,16 +3,17 @@ package com.mrd.restaurant.discovery.data.datasource
 import com.mrd.restaurant.diiscovery.domain.repository.RestaurantFilter
 import com.mrd.restaurant.diiscovery.domain.repository.RestaurantFilters
 import com.mrd.restaurant.discovery.core.primitive.model.Pagination
+import com.mrd.restaurant.discovery.data.persistence.dao.RestaurantDao
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import kotlin.random.Random
 
-class LocalRestaurantsDataSourceTest {
+class LocalRestaurantsDataSourceImplTest {
 
     private val restaurantDao = mockk<RestaurantDao>(relaxed = true)
-    private val subject = LocalRestaurantsDataSource(restaurantDao)
+    private val subject = LocalRestaurantsDataSourceImpl(restaurantDao)
 
     @Test
     fun `when getRestaurants then call data source with correct arguments`() = runTest {

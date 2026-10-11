@@ -1,23 +1,22 @@
 package com.mrd.restaurant.discovery.data.datasource
 
-import androidx.room.Dao
-import androidx.room.Database
-import androidx.room.Embedded
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import androidx.room.Query
-import androidx.room.RoomDatabase
 import com.mrd.restaurant.diiscovery.domain.repository.RestaurantFilter
 import com.mrd.restaurant.diiscovery.domain.repository.RestaurantFilters
 import com.mrd.restaurant.discovery.core.primitive.model.PagedResult
 import com.mrd.restaurant.discovery.core.primitive.model.Pagination
+import com.mrd.restaurant.discovery.data.persistence.dao.RestaurantDao
+import com.mrd.restaurant.discovery.data.persistence.model.RestaurantEntity
 import kotlin.math.max
 
-class LocalRestaurantsDataSource(
-    private val restaurantDao: RestaurantDao
-) {
+interface LocalRestaurantsDataSource {
+    suspend fun getRestaurants(filters: RestaurantFilters, pagination: Pagination): PagedResult<RestaurantEntity>
+}
 
-    suspend fun getRestaurants(filters: RestaurantFilters, pagination: Pagination): PagedResult<RestaurantEntity> {
+class LocalRestaurantsDataSourceImpl(
+    private val restaurantDao: RestaurantDao
+): LocalRestaurantsDataSource {
+
+    override suspend fun getRestaurants(filters: RestaurantFilters, pagination: Pagination): PagedResult<RestaurantEntity> {
         val filters = filters.filters
         val queryFilter = filters.firstOrNull {
             it is RestaurantFilter.Query
@@ -45,52 +44,5 @@ class LocalRestaurantsDataSource(
             totalCount = totalCount
         )
     }
-
-}
-
-@Database(entities = [RestaurantEntity::class], version = 1)
-abstract class RestaurantDiscoveryDatabase : RoomDatabase() {
-
-    abstract fun restaurantDao(): RestaurantDao
-
-}
-
-@Entity(tableName = "Restaurant")
-data class RestaurantEntity(
-    @PrimaryKey val id: String = "",
-    val name: String = "",
-    val cuisines: String = "",
-    val rating: Double = 0.0,
-    val deliveryFeeInCents: Double = 0.0,
-    val etaMinutes: Int = 0,
-    val isOpen: Boolean = false,
-    val imageUrl: String = ""
-)
-
-data class RestaurantEntityPagedResult(
-    @Embedded val restaurant: RestaurantEntity,
-    val totalCount: Int = 0
-)
-
-@Dao
-interface RestaurantDao {
-
-    @Query(
-        """
-        SELECT *, COUNT(*) OVER() AS totalCount 
-        FROM Restaurant 
-        WHERE 
-            (:query IS NULL OR name LIKE '%' || :query || '%') AND 
-            (:isOpen IS NULL OR isOpen = :isOpen)
-        LIMIT :pageSize
-        OFFSET :offset
-        """
-    )
-    suspend fun getRestaurants(
-        query: String? = null,
-        isOpen: Boolean? = null,
-        pageSize: Int,
-        offset: Int
-    ): List<RestaurantEntityPagedResult>
 
 }

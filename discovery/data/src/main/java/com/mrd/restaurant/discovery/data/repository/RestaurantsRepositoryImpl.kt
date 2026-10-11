@@ -6,7 +6,7 @@ import com.mrd.restaurant.diiscovery.domain.repository.RestaurantsRepository
 import com.mrd.restaurant.discovery.core.primitive.model.PagedResult
 import com.mrd.restaurant.discovery.core.primitive.model.Pagination
 import com.mrd.restaurant.discovery.data.datasource.LocalRestaurantsDataSource
-import com.mrd.restaurant.discovery.data.datasource.RestaurantEntity
+import com.mrd.restaurant.discovery.data.persistence.model.RestaurantEntity
 
 class RestaurantsRepositoryImpl(
     private val localDataSource: LocalRestaurantsDataSource
