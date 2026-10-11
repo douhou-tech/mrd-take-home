@@ -30,7 +30,7 @@ class FilterRestaurantsUseCaseTest : KoinTest {
     }
 
     @Test
-    fun `when invoke then return success with correct result`() = runTest {
+    fun `when invoke and success then success result should be returned`() = runTest {
         val filters = mockk<RestaurantFilters>()
         val pagination = mockk<Pagination>()
         val data = mockk<PaginationResult<Restaurant>>()
@@ -41,4 +41,16 @@ class FilterRestaurantsUseCaseTest : KoinTest {
         actual shouldBeEqual EitherResult.Success(data)
     }
 
+    @Test
+    fun `when invoke and exception is thrown then unknown error result should be returned`() = runTest {
+        val filters = mockk<RestaurantFilters>()
+        val pagination = mockk<Pagination>()
+        coEvery {
+            restaurantsRepository.filterRestaurants(eq(filters), eq(pagination))
+        } throws mockk<Exception>()
+
+        val actual = subject(filters, pagination)
+
+        actual shouldBeEqual EitherResult.Error(FilterRestaurantsUseCase.Error.Unknown)
+    }
 }
