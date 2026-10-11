@@ -25,4 +25,5 @@ android {
 dependencies {
     implementation(project(":discovery:core:primitives"))
     implementation(project(":discovery:domain"))
+    implementation(libs.koin.android)
 }

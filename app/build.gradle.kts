@@ -60,6 +60,9 @@ dependencies {
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
 
+    implementation(project(":discovery:domain"))
+    implementation(project(":discovery:data"))
+
     // Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.remote.config)

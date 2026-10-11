@@ -14,5 +14,6 @@ kotlin {
 }
 dependencies {
     implementation(project(":discovery:core:primitives"))
+    implementation(libs.koin.core)
 }
 
