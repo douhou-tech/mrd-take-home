@@ -19,6 +19,19 @@ internal object RestaurantsMapper {
         )
     }
 
+    fun RestaurantRemoteModel.toEntity(): RestaurantEntity {
+        return RestaurantEntity(
+            id = id,
+            name = name,
+            cuisines = cuisines,
+            rating = rating,
+            deliveryFeeInCents = deliveryFeeInCents,
+            etaMinutes = etaMinutes,
+            isOpen = isOpen,
+            imageUrl = imageUrl
+        )
+    }
+
     fun RestaurantEntity.toDomain(): Restaurant {
         return Restaurant(
             id = id,
@@ -32,4 +45,3 @@ internal object RestaurantsMapper {
         )
     }
 }
-

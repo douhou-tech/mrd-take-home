@@ -3,6 +3,7 @@ package com.mrd.restaurant.discovery.data.repository
 import com.mrd.restaurant.diiscovery.domain.repository.RestaurantFilters
 import com.mrd.restaurant.discovery.core.primitive.model.Pagination
 import com.mrd.restaurant.discovery.data.datasource.LocalRestaurantsDataSource
+import com.mrd.restaurant.discovery.data.datasource.RemoteRestaurantsDataSource
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
@@ -12,10 +13,11 @@ import kotlin.random.Random
 class RestaurantsRepositoryImplTest {
 
     private val localDataSource = mockk<LocalRestaurantsDataSource>(relaxed = true)
-    private val subject = RestaurantsRepositoryImpl(localDataSource)
+    private val remoteDataSource = mockk<RemoteRestaurantsDataSource>(relaxed = true)
+    private val subject = RestaurantsRepositoryImpl(localDataSource, remoteDataSource)
 
     @Test
-    fun `when filterRestaurants then call data source with correct arguments`() = runTest {
+    fun `when filterRestaurants then call remote first, persist locally, and get from local`() = runTest {
         val filters = RestaurantFilters()
         val pagination = Pagination(
             pageSize = Random.nextInt(10, 50),
@@ -25,6 +27,8 @@ class RestaurantsRepositoryImplTest {
         subject.filterRestaurants(filters, pagination)
 
         coVerify {
+            remoteDataSource.getRestaurants(eq(filters), eq(pagination))
+            localDataSource.upsertRestaurants(any())
             localDataSource.getRestaurants(eq(filters), eq(pagination))
         }
     }

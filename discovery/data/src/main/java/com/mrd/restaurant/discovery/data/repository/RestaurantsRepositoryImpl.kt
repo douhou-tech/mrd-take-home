@@ -6,23 +6,30 @@ import com.mrd.restaurant.diiscovery.domain.repository.RestaurantsRepository
 import com.mrd.restaurant.discovery.core.primitive.model.PagedResult
 import com.mrd.restaurant.discovery.core.primitive.model.Pagination
 import com.mrd.restaurant.discovery.data.datasource.LocalRestaurantsDataSource
+import com.mrd.restaurant.discovery.data.datasource.RemoteRestaurantsDataSource
 import com.mrd.restaurant.discovery.data.mapper.RestaurantsMapper.toDomain
+import com.mrd.restaurant.discovery.data.mapper.RestaurantsMapper.toEntity
 
 class RestaurantsRepositoryImpl(
-    private val localDataSource: LocalRestaurantsDataSource
+    private val localDataSource: LocalRestaurantsDataSource,
+    private val remoteDataSource: RemoteRestaurantsDataSource
 ) : RestaurantsRepository {
 
     override suspend fun filterRestaurants(
         filters: RestaurantFilters,
         pagination: Pagination
     ): PagedResult<Restaurant> {
-        val result = localDataSource.getRestaurants(filters, pagination)
-        val domainItems = result.items.map { it.toDomain() }
+        val remoteResult = remoteDataSource.getRestaurants(filters, pagination)
+        val entities = remoteResult.items.map { it.toEntity() }
+        localDataSource.upsertRestaurants(entities)
+        val localResult = localDataSource.getRestaurants(filters, pagination)
+        val domainItems = localResult.items.map { it.toDomain() }
+
         return PagedResult(
             items = domainItems,
-            pageSize = result.pageSize,
-            currentPage = result.currentPage,
-            totalCount = result.totalCount
+            pageSize = localResult.pageSize,
+            currentPage = localResult.currentPage,
+            totalCount = localResult.totalCount
         )
     }
 

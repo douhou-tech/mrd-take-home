@@ -9,16 +9,16 @@ import kotlinx.serialization.json.Json
 import kotlin.math.max
 import kotlin.math.min
 
-interface RemoteDataSource {
+interface RemoteRestaurantsDataSource {
     suspend fun getRestaurants(
         filters: RestaurantFilters = RestaurantFilters(),
         pagination: Pagination = Pagination(page = 0, pageSize = 20),
     ): PagedResult<RestaurantRemoteModel>
 }
 
-internal class MockRemoteDataSource(
+internal class MockRemoteRestaurantsDataSource(
     val restaurantsJson: String,
-) : RemoteDataSource {
+) : RemoteRestaurantsDataSource {
 
     private val allRestaurants: List<RestaurantRemoteModel> by lazy {
         Json.decodeFromString(restaurantsJson)

@@ -8,9 +8,9 @@ import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class RemoteDataSourceTest {
+class RemoteRestaurantsDataSourceTest {
 
-    private val subject: RemoteDataSource = MockRemoteDataSource(loadRestaurantsJson())
+    private val subject: RemoteRestaurantsDataSource = MockRemoteRestaurantsDataSource(loadRestaurantsJson())
 
     @Test
     fun `when getRestaurants without filters then return 100 Cape Town CBD restaurants paginated`() = runTest {
@@ -59,7 +59,6 @@ class RemoteDataSourceTest {
     fun `when getRestaurants with pagination then return correct paginated sublist`() = runTest {
         val page0 = subject.getRestaurants(pagination = Pagination(page = 0, pageSize = 10))
         val page1 = subject.getRestaurants(pagination = Pagination(page = 1, pageSize = 10))
-
         assertEquals(10, page0.items.size)
         assertEquals(10, page1.items.size)
         assertEquals(100, page0.totalCount)
@@ -71,7 +70,7 @@ class RemoteDataSourceTest {
 private fun loadRestaurantsJson(): String {
     return try {
         Thread.currentThread().contextClassLoader?.getResource("mocks/restaurants.json")?.readText()
-            ?: RemoteDataSourceTest::class.java.classLoader?.getResource("mocks/restaurants.json")?.readText()
+            ?: RemoteRestaurantsDataSourceTest::class.java.classLoader?.getResource("mocks/restaurants.json")?.readText()
             ?: "[]"
     } catch (_: Exception) {
         "[]"

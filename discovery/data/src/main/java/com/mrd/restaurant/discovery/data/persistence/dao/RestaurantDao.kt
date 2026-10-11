@@ -2,10 +2,15 @@ package com.mrd.restaurant.discovery.data.persistence.dao
 
 import androidx.room.Dao
 import androidx.room.Query
+import androidx.room.Upsert
+import com.mrd.restaurant.discovery.data.persistence.model.RestaurantEntity
 import com.mrd.restaurant.discovery.data.persistence.model.RestaurantEntityPagedResult
 
 @Dao
 interface RestaurantDao {
+
+    @Upsert
+    suspend fun upsertRestaurants(restaurants: List<RestaurantEntity>)
 
     @Query(
         """

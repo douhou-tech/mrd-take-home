@@ -10,6 +10,7 @@ import kotlin.math.max
 
 interface LocalRestaurantsDataSource {
     suspend fun getRestaurants(filters: RestaurantFilters, pagination: Pagination): PagedResult<RestaurantEntity>
+    suspend fun upsertRestaurants(restaurants: List<RestaurantEntity>)
 }
 
 class LocalRestaurantsDataSourceImpl(
@@ -43,6 +44,10 @@ class LocalRestaurantsDataSourceImpl(
             pageSize = pagination.pageSize,
             totalCount = totalCount
         )
+    }
+
+    override suspend fun upsertRestaurants(restaurants: List<RestaurantEntity>) {
+        restaurantDao.upsertRestaurants(restaurants)
     }
 
 }
