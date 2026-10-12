@@ -1,7 +1,7 @@
 package com.mrd.restaurant.discovery.data.di
 
 import androidx.room.Room
-import com.mrd.restaurant.diiscovery.domain.repository.RestaurantsRepository
+import com.mrd.restaurant.discovery.domain.repository.RestaurantsRepository
 import com.mrd.restaurant.discovery.core.logging.Logger
 import com.mrd.restaurant.discovery.data.datasource.LocalRestaurantsDataSource
 import com.mrd.restaurant.discovery.data.datasource.LocalRestaurantsDataSourceImpl

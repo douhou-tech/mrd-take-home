@@ -1,4 +1,4 @@
-package com.mrd.restaurant.discovery.feature.ui.component
+package com.mrd.restaurant.discovery.feature.component
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.input.TextFieldState

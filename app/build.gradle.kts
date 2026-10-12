@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.mrd.android.compose)
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
+    alias(libs.plugins.mrd.kotlin.unit.tests)
 }
 
 android {
@@ -41,6 +42,11 @@ android {
 }
 
 dependencies {
+    implementation(project(":discovery:core:primitives"))
+    implementation(project(":discovery:domain"))
+    implementation(project(":discovery:data"))
+    implementation(project(":discovery:feature"))
+
     // Ktor
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.okhttp)
@@ -51,11 +57,7 @@ dependencies {
     // Koin
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
-
-    implementation(project(":discovery:core:primitives"))
-    implementation(project(":discovery:domain"))
-    implementation(project(":discovery:data"))
-    implementation(project(":discovery:feature"))
+    implementation(libs.koin.androidx.compose.navigation)
 
     // Timber
     implementation(libs.timber)
@@ -65,18 +67,7 @@ dependencies {
     implementation(libs.firebase.remote.config)
     implementation(libs.firebase.crashlytics)
 
-    // TODO move to convention plugin
-    // Testing
-    testImplementation(libs.junit)
-    testImplementation(libs.mockk)
-    testImplementation(libs.kotest.assertions.core)
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.koin.test)
-    testImplementation(libs.koin.test.junit4)
-
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
-    debugImplementation(libs.androidx.compose.ui.tooling)
-    debugImplementation(libs.androidx.compose.ui.test.manifest)
+    // Navigation
+    implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.androidx.navigation3.ui)
 }

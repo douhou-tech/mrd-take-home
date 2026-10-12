@@ -1,4 +1,4 @@
-package com.mrd.restaurant.discovery.feature.ui
+package com.mrd.restaurant.discovery.feature.screen.browse
 
 import android.util.Log
 import androidx.compose.animation.core.LinearEasing
@@ -47,14 +47,18 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.mrd.restaurant.diiscovery.domain.model.Restaurant
-import com.mrd.restaurant.discovery.feature.ui.component.MrDSearchBar
+import com.mrd.restaurant.discovery.domain.model.Restaurant
+import com.mrd.restaurant.discovery.feature.ui.Dimens
+import com.mrd.restaurant.discovery.feature.component.MrDSearchBar
+import com.mrd.restaurant.discovery.feature.navigation.FeatureNavKey
+import com.mrd.restaurant.discovery.feature.navigation.FeatureNavigator
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun RestaurantDiscoveryScreen(
     viewModel: RestaurantDiscoveryViewModel = koinViewModel(),
+    navigator: FeatureNavigator,
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val filterState by viewModel.filterState.collectAsState()
@@ -100,7 +104,8 @@ fun RestaurantDiscoveryScreen(
                         is RestaurantDiscoveryUiState.Error -> ErrorResultsContent(message = state.message)
                         is RestaurantDiscoveryUiState.Success -> SuccessResultsContent(
                             state = state,
-                            onNextPage = { viewModel.onIntent(RestaurantDiscoveryIntent.LoadMore) }
+                            onIntent = viewModel::onIntent,
+                            onNavigateTo = navigator::navigateTo
                         )
                         else -> {}
                     }
@@ -177,7 +182,8 @@ private fun ErrorResultsContent(message: String) {
 private fun SuccessResultsContent(
     modifier: Modifier = Modifier,
     state: RestaurantDiscoveryUiState.Success,
-    onNextPage: () -> Unit,
+    onIntent: (RestaurantDiscoveryIntent) -> Unit,
+    onNavigateTo: (FeatureNavKey) -> Unit
 ) {
     val listState = rememberLazyListState()
     val shouldLoadMore by remember {
@@ -191,7 +197,7 @@ private fun SuccessResultsContent(
     }
 
     LaunchedEffect(shouldLoadMore) {
-        if (shouldLoadMore) onNextPage()
+        if (shouldLoadMore) onIntent(RestaurantDiscoveryIntent.LoadMore)
     }
 
     Box(modifier = modifier.fillMaxSize()) {
@@ -200,10 +206,13 @@ private fun SuccessResultsContent(
             items(restaurants.size, key = { restaurants[it].id }) { index ->
                 val restaurant = state.restaurants[index]
                 RestaurantItem(
+                    modifier = Modifier.clickable {
+                        onNavigateTo(FeatureNavKey.RestaurantDetails)
+                    },
                     restaurant = restaurant
                 )
                 if (index != restaurants.lastIndex) {
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(Dimens.SpacingSmall))
                 }
             }
             if (state.isLoadingMore) {
@@ -211,7 +220,7 @@ private fun SuccessResultsContent(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
+                            .padding(Dimens.SpacingMedium),
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator()
@@ -223,11 +232,15 @@ private fun SuccessResultsContent(
 }
 
 @Composable
-private fun RestaurantItem(restaurant: Restaurant) {
-
-    Column(modifier = Modifier.padding(vertical = Dimens.SpacingSmall)) {
+private fun RestaurantItem(
+    modifier: Modifier = Modifier,
+    restaurant: Restaurant
+) {
+    Column(modifier = modifier
+        .padding(vertical = Dimens.SpacingSmall)
+    ) {
         RestaurantImage(
-            modifier = Modifier.padding(bottom = 8.dp),
+            modifier = Modifier.padding(bottom = Dimens.SpacingSmall),
             imageUrl = restaurant.imageUrl
         )
         Text(text = restaurant.displayName(), style = MaterialTheme.typography.titleMedium)

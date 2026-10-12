@@ -1,6 +1,6 @@
 package com.mrd.restaurant.discovery.data.repository
 
-import com.mrd.restaurant.diiscovery.domain.repository.RestaurantFilters
+import com.mrd.restaurant.discovery.domain.repository.RestaurantFilters
 import com.mrd.restaurant.discovery.core.primitive.model.Pagination
 import com.mrd.restaurant.discovery.data.datasource.LocalRestaurantsDataSource
 import com.mrd.restaurant.discovery.data.datasource.RemoteRestaurantsDataSource

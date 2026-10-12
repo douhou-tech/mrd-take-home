@@ -1,6 +1,6 @@
-package com.mrd.restaurant.diiscovery.domain.di
+package com.mrd.restaurant.discovery.domain
 
-import com.mrd.restaurant.diiscovery.domain.usecase.FilterRestaurantsUseCase
+import com.mrd.restaurant.discovery.domain.usecase.FilterRestaurantsUseCase
 import org.koin.dsl.module
 
 val restaurantDiscoveryDomainModule = module {

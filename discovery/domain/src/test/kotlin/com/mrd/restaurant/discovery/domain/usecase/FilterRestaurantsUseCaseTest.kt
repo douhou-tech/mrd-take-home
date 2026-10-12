@@ -1,9 +1,9 @@
-package com.mrd.restaurant.diiscovery.domain.usecase
+package com.mrd.restaurant.discovery.domain.usecase
 
-import com.mrd.restaurant.diiscovery.domain.model.Restaurant
-import com.mrd.restaurant.diiscovery.domain.repository.RestaurantFilter
-import com.mrd.restaurant.diiscovery.domain.repository.RestaurantFilters
-import com.mrd.restaurant.diiscovery.domain.repository.RestaurantsRepository
+import com.mrd.restaurant.discovery.domain.model.Restaurant
+import com.mrd.restaurant.discovery.domain.repository.RestaurantFilter
+import com.mrd.restaurant.discovery.domain.repository.RestaurantFilters
+import com.mrd.restaurant.discovery.domain.repository.RestaurantsRepository
 import com.mrd.restaurant.discovery.core.logging.Logger
 import com.mrd.restaurant.discovery.core.primitive.model.EitherResult
 import com.mrd.restaurant.discovery.core.primitive.model.PagedResult

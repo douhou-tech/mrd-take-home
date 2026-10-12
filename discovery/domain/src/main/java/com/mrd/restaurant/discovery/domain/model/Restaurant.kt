@@ -1,4 +1,4 @@
-package com.mrd.restaurant.diiscovery.domain.model
+package com.mrd.restaurant.discovery.domain.model
 
 data class Restaurant(
     val id: String = "",

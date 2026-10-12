@@ -1,12 +1,12 @@
-package com.mrd.restaurant.discovery.feature.ui
+package com.mrd.restaurant.discovery.feature.screen.browse
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mrd.restaurant.diiscovery.domain.model.Restaurant
-import com.mrd.restaurant.diiscovery.domain.repository.RestaurantFilter
-import com.mrd.restaurant.diiscovery.domain.repository.RestaurantFilters
-import com.mrd.restaurant.diiscovery.domain.usecase.FilterRestaurantsUseCase
+import com.mrd.restaurant.discovery.domain.model.Restaurant
+import com.mrd.restaurant.discovery.domain.repository.RestaurantFilter
+import com.mrd.restaurant.discovery.domain.repository.RestaurantFilters
+import com.mrd.restaurant.discovery.domain.usecase.FilterRestaurantsUseCase
 import com.mrd.restaurant.discovery.core.primitive.model.EitherResult
 import com.mrd.restaurant.discovery.core.primitive.model.Pagination
 import kotlinx.coroutines.flow.MutableStateFlow

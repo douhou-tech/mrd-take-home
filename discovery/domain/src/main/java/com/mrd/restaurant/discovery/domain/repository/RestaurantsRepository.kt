@@ -1,6 +1,6 @@
-package com.mrd.restaurant.diiscovery.domain.repository
+package com.mrd.restaurant.discovery.domain.repository
 
-import com.mrd.restaurant.diiscovery.domain.model.Restaurant
+import com.mrd.restaurant.discovery.domain.model.Restaurant
 import com.mrd.restaurant.discovery.core.primitive.model.Pagination
 import com.mrd.restaurant.discovery.core.primitive.model.PagedResult
 
