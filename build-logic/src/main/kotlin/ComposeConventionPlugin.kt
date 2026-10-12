@@ -13,7 +13,8 @@ class ComposeConventionPlugin : Plugin<Project> {
                 "androidx-compose-ui",
                 "androidx-compose-ui-graphics",
                 "androidx-compose-ui-tooling-preview",
-                "androidx-compose-material3"
+                "androidx-compose-material3",
+                "androidx-material-icons-core"
             )
     }
 

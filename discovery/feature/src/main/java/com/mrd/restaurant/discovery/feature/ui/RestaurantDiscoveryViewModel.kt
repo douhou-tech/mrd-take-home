@@ -12,6 +12,7 @@ import com.mrd.restaurant.discovery.core.primitive.model.Pagination
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class RestaurantDiscoveryViewModel(
@@ -35,10 +36,16 @@ class RestaurantDiscoveryViewModel(
         get() = savedStateHandle[KEY_PAGE_SIZE] ?: 20
         set(value) { savedStateHandle[KEY_PAGE_SIZE] = value }
 
-    private val _uiState = MutableStateFlow<RestaurantDiscoveryUiState>(
-        RestaurantDiscoveryUiState.Loading(query = query, isOpenNow = isOpenNow)
+    private val _uiState = MutableStateFlow<RestaurantDiscoveryUiState>(RestaurantDiscoveryUiState.Loading)
+    private val _filterState = MutableStateFlow(
+        RestaurantDiscoveryFilterState(
+            query = query,
+            isOpenNow = isOpenNow,
+            totalCount = 0
+        )
     )
     val uiState: StateFlow<RestaurantDiscoveryUiState> = _uiState.asStateFlow()
+    val filterState: StateFlow<RestaurantDiscoveryFilterState> = _filterState.asStateFlow()
 
     init {
         loadRestaurants()
@@ -50,80 +57,110 @@ class RestaurantDiscoveryViewModel(
                 if (query != intent.query) {
                     query = intent.query
                     currentPage = 0
+                    _filterState.update {
+                        it.copy(query = query)
+                    }
                     loadRestaurants()
                 }
             }
             is RestaurantDiscoveryIntent.ToggleOpenNow -> {
                 if (isOpenNow != intent.isOpenNow) {
                     isOpenNow = intent.isOpenNow
+                    _filterState.update {
+                        it.copy(isOpenNow = isOpenNow)
+                    }
                     currentPage = 0
                     loadRestaurants()
                 }
             }
-            RestaurantDiscoveryIntent.NextPage -> {
-                val currentState = _uiState.value
-                if (currentState is RestaurantDiscoveryUiState.Success) {
-                    if ((currentPage + 1) * pageSize < currentState.totalCount) {
-                        currentPage++
-                        loadRestaurants()
+            RestaurantDiscoveryIntent.LoadMore -> {
+                val uiState = _uiState.value
+                val filterState = _filterState.value
+                if (uiState is RestaurantDiscoveryUiState.Success) {
+                    if ((currentPage + 1) * pageSize < filterState.totalCount) {
+                        loadMoreRestaurants(uiState)
                     }
-                }
-            }
-            RestaurantDiscoveryIntent.PreviousPage -> {
-                if (currentPage > 0) {
-                    currentPage--
-                    loadRestaurants()
                 }
             }
         }
     }
 
     private fun loadRestaurants() {
-        val filtersList = mutableListOf<RestaurantFilter>()
-        if (query.isNotBlank()) {
-            filtersList.add(RestaurantFilter.Query(query))
-        }
-        if (isOpenNow) {
-            filtersList.add(RestaurantFilter.IsOpenNow)
-        }
-        val filters = RestaurantFilters(filtersList.toSet())
-
         viewModelScope.launch {
-            _uiState.value = RestaurantDiscoveryUiState.Loading(
-                query = query,
-                isOpenNow = isOpenNow
-            )
+            _uiState.update {
+                RestaurantDiscoveryUiState.Loading
+            }
 
-            val pagination = Pagination(page = currentPage, pageSize = pageSize)
-            when (val result = filterRestaurantsUseCase(filters, pagination)) {
+            val nextState = when (val result = filterRestaurantsUseCase(filters(), pagination())) {
                 is EitherResult.Success -> {
                     val paged = result.data
                     if (paged.items.isEmpty()) {
-                        _uiState.value = RestaurantDiscoveryUiState.Empty(
-                            query = query,
-                            isOpenNow = isOpenNow
-                        )
+                        _filterState.update {
+                            it.copy(
+                                totalCount = 0
+                            )
+                        }
+                        RestaurantDiscoveryUiState.Empty
                     } else {
-                        _uiState.value = RestaurantDiscoveryUiState.Success(
-                            query = query,
-                            isOpenNow = isOpenNow,
+                        _filterState.update {
+                            it.copy(
+                                totalCount = paged.totalCount
+                            )
+                        }
+                        RestaurantDiscoveryUiState.Success(
                             restaurants = paged.items,
                             currentPage = paged.currentPage,
                             pageSize = paged.pageSize,
-                            totalCount = paged.totalCount,
                         )
                     }
                 }
                 is EitherResult.Error -> {
-                    _uiState.value = RestaurantDiscoveryUiState.Error(
-                        query = query,
-                        isOpenNow = isOpenNow,
-                        message = "Failed to load restaurants"
-                    )
+                    RestaurantDiscoveryUiState.Error("Failed to load restaurants")
                 }
             }
+
+            _uiState.update { nextState }
         }
     }
+
+    fun loadMoreRestaurants(state: RestaurantDiscoveryUiState.Success) {
+        viewModelScope.launch {
+            _uiState.value = state.copy(
+                isLoadingMore = true
+            )
+            val nextState = when (val result = filterRestaurantsUseCase(filters(), pagination())) {
+                is EitherResult.Success -> {
+                    val paged = result.data
+                    if (paged.items.isNotEmpty()) {
+                        currentPage += 1
+                        state.copy(
+                            restaurants = state.restaurants + paged.items,
+                            currentPage = paged.currentPage,
+                            pageSize = paged.pageSize,
+                            isLoadingMore = false
+                        )
+                    } else null
+                }
+                else -> null
+            }
+
+           if (nextState != null) _uiState.update { nextState }
+           else _uiState.update { state.copy(isLoadingMore = false) }
+        }
+
+    }
+
+    private fun filters(): RestaurantFilters {
+        val filters = buildSet {
+            if (query.isNotBlank()) add(RestaurantFilter.Query(query))
+            if (isOpenNow) add(RestaurantFilter.IsOpenNow)
+        }
+        return RestaurantFilters(
+            filters = filters
+        )
+    }
+
+    private fun pagination() = Pagination(page = currentPage, pageSize = pageSize)
 
     companion object {
         private const val KEY_QUERY = "query"
@@ -136,36 +173,27 @@ class RestaurantDiscoveryViewModel(
 sealed interface RestaurantDiscoveryIntent {
     data class SearchQueryChanged(val query: String) : RestaurantDiscoveryIntent
     data class ToggleOpenNow(val isOpenNow: Boolean) : RestaurantDiscoveryIntent
-    data object NextPage : RestaurantDiscoveryIntent
-    data object PreviousPage : RestaurantDiscoveryIntent
+    data object LoadMore : RestaurantDiscoveryIntent
 }
 
+data class RestaurantDiscoveryFilterState(
+    val query: String,
+    val isOpenNow: Boolean,
+    val totalCount: Int
+)
+
 sealed interface RestaurantDiscoveryUiState {
-    val query: String
-    val isOpenNow: Boolean
-
-    data class Loading(
-        override val query: String = "",
-        override val isOpenNow: Boolean = false,
-    ) : RestaurantDiscoveryUiState
-
-    data class Empty(
-        override val query: String = "",
-        override val isOpenNow: Boolean = false,
-    ) : RestaurantDiscoveryUiState
+    data object Loading : RestaurantDiscoveryUiState
+    data object Empty : RestaurantDiscoveryUiState
 
     data class Success(
-        override val query: String = "",
-        override val isOpenNow: Boolean = false,
         val restaurants: List<Restaurant>,
         val currentPage: Int,
         val pageSize: Int,
-        val totalCount: Int,
+        val isLoadingMore: Boolean = false
     ) : RestaurantDiscoveryUiState
 
     data class Error(
-        override val query: String = "",
-        override val isOpenNow: Boolean = false,
         val message: String,
     ) : RestaurantDiscoveryUiState
 }

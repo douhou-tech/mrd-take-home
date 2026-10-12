@@ -23,7 +23,8 @@ room = "2.8.5"
 ksp = "2.0.21-1.0.25"
 timber = "5.0.1"
 kotlinxSerializationJson = "1.11.0"
-coil = "3.1.0"
+coil = "3.6.3"
+androidx-material-icons = "1.7.8"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -37,6 +38,7 @@ androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "u
 androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-material-icons-core = { module = "androidx.compose.material:material-icons-core", version.ref = "androidx-material-icons" }
 
 # Ktor
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
