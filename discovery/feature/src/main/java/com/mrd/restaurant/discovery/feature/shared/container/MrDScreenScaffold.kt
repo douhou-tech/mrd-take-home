@@ -7,10 +7,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.mrd.restaurant.discovery.feature.ui.Dimens
 
 @Composable
 internal fun MrDScreenScaffold(
+    modifier: Modifier = Modifier,
     topBar: @Composable () -> Unit = {},
     content: @Composable BoxScope.() -> Unit
 ) {
@@ -19,10 +19,9 @@ internal fun MrDScreenScaffold(
         topBar = { topBar() }
     ) { innerPadding ->
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(horizontal = Dimens.SpacingMedium)
         ) {
             content()
         }

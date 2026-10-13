@@ -48,6 +48,8 @@ fun RestaurantDiscoveryScreen(
     val isKeyboardVisible = WindowInsets.isImeVisible
 
     MrDScreenScaffold(
+        modifier = Modifier
+            .padding(horizontal = Dimens.SpacingMedium),
         topBar = {
             RestaurantSearchBar(
                 modifier = Modifier
@@ -79,7 +81,7 @@ fun RestaurantDiscoveryScreen(
                 when (val state = uiState) {
                     is RestaurantDiscoveryUiState.Empty -> EmptyResultsContent()
                     is RestaurantDiscoveryUiState.Error -> ErrorResultsContent(message = state.message)
-                    is RestaurantDiscoveryUiState.Success -> SuccessResultsContent(
+                    is RestaurantDiscoveryUiState.Success -> RestaurantDiscoveryContent(
                         state = state,
                         onIntent = viewModel::onIntent
                     )
@@ -147,7 +149,7 @@ private fun ErrorResultsContent(message: String) {
 }
 
 @Composable
-private fun SuccessResultsContent(
+private fun RestaurantDiscoveryContent(
     modifier: Modifier = Modifier,
     state: RestaurantDiscoveryUiState.Success,
     onIntent: (RestaurantDiscoveryIntent) -> Unit
