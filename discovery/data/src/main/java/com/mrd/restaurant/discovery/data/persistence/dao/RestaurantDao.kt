@@ -19,6 +19,7 @@ interface RestaurantDao {
         WHERE 
             (:query IS NULL OR name LIKE '%' || :query || '%') AND 
             (:isOpen IS NULL OR isOpen = :isOpen)
+        ORDER BY isOpen DESC, name
         LIMIT :pageSize
         OFFSET :offset
         """

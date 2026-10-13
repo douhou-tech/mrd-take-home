@@ -1,6 +1,8 @@
 package com.mrd.restaurant.discovery.feature.screen.browse
 
+import android.provider.CalendarContract
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,7 +18,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.material3.Badge
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
@@ -29,6 +33,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import com.google.android.material.chip.Chip
 import com.mrd.restaurant.discovery.domain.model.Restaurant
 import com.mrd.restaurant.discovery.feature.shared.component.KeyboardVisibleContentMask
 import com.mrd.restaurant.discovery.feature.shared.component.MrDScreenLoader
@@ -208,10 +215,30 @@ private fun RestaurantItem(
     Column(modifier = modifier
         .padding(vertical = Dimens.SpacingSmall)
     ) {
-        RemoteImage(
-            modifier = Modifier.padding(bottom = Dimens.SpacingSmall),
-            imageUrl = restaurant.imageUrl
-        )
+        Box(modifier = Modifier.fillMaxSize()) {
+            RemoteImage(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(
+                        topStart = Dimens.SpacingSmall,
+                        topEnd = Dimens.SpacingSmall,
+                    ))
+                    .padding(bottom = Dimens.SpacingSmall),
+                imageUrl = restaurant.imageUrl
+            )
+            if (!restaurant.isOpen) {
+                Box(
+                    modifier = Modifier
+                        .background(Color.Black.copy(alpha = 0.6f))
+                        .matchParentSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        style = MaterialTheme.typography.bodyLarge,
+                        text = "Closed"
+                    )
+                }
+            }
+        }
         Text(text = restaurant.displayName(), style = MaterialTheme.typography.titleMedium)
         Text(text = restaurant.cuisines, style = MaterialTheme.typography.bodyMedium)
         Text(
