@@ -1,5 +1,8 @@
 package com.mrd.restaurant.discovery.domain.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Restaurant(
     val id: String = "",
     val name: String = "",

@@ -1,6 +1,7 @@
 package com.mrd.restaurant.discovery.demo
 
 import android.app.Application
+import com.google.firebase.BuildConfig
 import com.mrd.restaurant.discovery.domain.restaurantDiscoveryDomainModule
 import com.mrd.restaurant.discovery.data.di.restaurantDiscoveryDataModule
 import com.mrd.restaurant.discovery.demo.di.appModule
@@ -9,11 +10,15 @@ import com.mrd.restaurant.discovery.feature.di.restaurantDetailsFeatureModule
 import com.mrd.restaurant.discovery.feature.di.restaurantDiscoveryFeatureModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
+import timber.log.Timber
 
 class DemoApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+
+        Timber.plant(Timber.DebugTree())
+
         startKoin {
             androidContext(this@DemoApplication)
             modules(

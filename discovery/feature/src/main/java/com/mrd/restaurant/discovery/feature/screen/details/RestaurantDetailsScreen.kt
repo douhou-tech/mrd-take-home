@@ -2,8 +2,27 @@ package com.mrd.restaurant.discovery.feature.screen.details
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.mrd.restaurant.discovery.feature.navigation.FeatureNavigator
+import com.mrd.restaurant.discovery.feature.shared.container.MrDScreenScaffold
 
 @Composable
-fun RestaurantDetailsScreen() {
-    Text("Browse")
+fun RestaurantDetailsScreen(
+    viewModel: RestaurantDetailsViewModel,
+    navigator: FeatureNavigator
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    MrDScreenScaffold {
+        when (val state = uiState) {
+            is RestaurantDetailsUiState.Error -> Unit
+            RestaurantDetailsUiState.Loading -> Unit
+            is RestaurantDetailsUiState.Success -> {
+                val restaurant = state.restaurant
+                Text(text = restaurant.name)
+            }
+        }
+    }
 }
+

@@ -1,10 +1,16 @@
 package com.mrd.restaurant.discovery.data.datasource
 
-import com.mrd.restaurant.discovery.domain.repository.RestaurantFilter
-import com.mrd.restaurant.discovery.domain.repository.RestaurantFilters
 import com.mrd.restaurant.discovery.core.primitive.model.Pagination
 import com.mrd.restaurant.discovery.data.persistence.dao.RestaurantDao
+import com.mrd.restaurant.discovery.data.persistence.model.RestaurantEntity
+import com.mrd.restaurant.discovery.data.persistence.model.RestaurantEntityPagedResult
+import com.mrd.restaurant.discovery.domain.repository.RestaurantFilter
+import com.mrd.restaurant.discovery.domain.repository.RestaurantFilters
+import com.mrd.test.randomString
+import io.kotest.matchers.equals.shouldBeEqual
+import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
@@ -34,6 +40,26 @@ class LocalRestaurantsDataSourceImplTest {
                 offset = eq(offest)
             )
         }
+    }
+
+    @Test
+    fun `when getRestaurants then data source returns correct result`() = runTest {
+        val expected = mockk<RestaurantEntity>()
+        val result = mockk<RestaurantEntityPagedResult>(relaxed = true).apply {
+            every { restaurant } returns expected
+        }
+        val filters = RestaurantFilters()
+        val pagination = Pagination(
+            page = 0,
+            pageSize = 0
+        )
+        coEvery {
+            restaurantDao.getRestaurants(any(), any(), any(), any())
+        } returns listOf(result)
+
+        val actual = subject.getRestaurants(filters, pagination)
+
+        actual.items shouldBeEqual listOf(expected)
     }
 
     @Test
@@ -104,4 +130,24 @@ class LocalRestaurantsDataSourceImplTest {
         }
     }
 
+    @Test
+    fun `when getRestaurant then call data source with correct arguments`() = runTest {
+        val id = randomString(10)
+
+        subject.getRestaurant(id)
+
+        coVerify {
+            restaurantDao.getRestaurant(eq(id))
+        }
+    }
+
+    @Test
+    fun `when getRestaurant then data source returns correct result`() = runTest {
+        val expected = mockk<RestaurantEntity>()
+        coEvery { restaurantDao.getRestaurant(any()) } returns expected
+
+        val actual = subject.getRestaurant(randomString(10))
+
+        actual shouldBeEqual expected
+    }
 }

@@ -27,6 +27,7 @@ android {
 dependencies {
     implementation(project(":discovery:core:primitives"))
     implementation(project(":discovery:domain"))
+    implementation(project(":discovery:test"))
     implementation(libs.koin.android)
     implementation(libs.kotlinx.serialization.json)
 }

@@ -11,6 +11,9 @@ interface RestaurantsRepository {
         pagination: Pagination
     ): PagedResult<Restaurant>
 
+    suspend fun getRestaurant(
+        id: String
+    ): Restaurant?
 }
 
 data class RestaurantFilters(

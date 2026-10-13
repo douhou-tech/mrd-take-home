@@ -1,22 +1,13 @@
 package com.mrd.restaurant.discovery.feature.screen.browse
 
 import android.util.Log
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -29,7 +20,6 @@ import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -39,19 +29,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
 import com.mrd.restaurant.discovery.domain.model.Restaurant
-import com.mrd.restaurant.discovery.feature.ui.Dimens
-import com.mrd.restaurant.discovery.feature.component.MrDSearchBar
 import com.mrd.restaurant.discovery.feature.navigation.FeatureNavKey
 import com.mrd.restaurant.discovery.feature.navigation.FeatureNavigator
+import com.mrd.restaurant.discovery.feature.shared.component.KeyboardVisibleContentMask
+import com.mrd.restaurant.discovery.feature.shared.component.MrDScreenLoader
+import com.mrd.restaurant.discovery.feature.shared.component.MrDSearchBar
+import com.mrd.restaurant.discovery.feature.shared.component.RemoteImage
+import com.mrd.restaurant.discovery.feature.shared.container.MrDScreenScaffold
+import com.mrd.restaurant.discovery.feature.ui.Dimens
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -65,8 +51,7 @@ fun RestaurantDiscoveryScreen(
 
     val isKeyboardVisible = WindowInsets.isImeVisible
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
+    MrDScreenScaffold(
         topBar = {
             RestaurantSearchBar(
                 modifier = Modifier
@@ -78,45 +63,40 @@ fun RestaurantDiscoveryScreen(
                 }
             )
         }
-    ) { innerPadding ->
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .padding(innerPadding)
-            .padding(horizontal = Dimens.SpacingMedium)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
+            RestaurantFilterSection(
+                isOpenNow = filterState.isOpenNow,
+                totalCount = filterState.totalCount,
+                onToggleOpenNow = {
+                    viewModel.onIntent(RestaurantDiscoveryIntent.ToggleOpenNow(it))
+                }
+            )
+
+            Box(modifier = Modifier
+                .fillMaxSize()
+                .padding(top = Dimens.SpacingMedium)
             ) {
-                RestaurantFilterSection(
-                    isOpenNow = filterState.isOpenNow,
-                    totalCount = filterState.totalCount,
-                    onToggleOpenNow = {
-                        viewModel.onIntent(RestaurantDiscoveryIntent.ToggleOpenNow(it))
-                    }
-                )
-
-                Spacer(modifier = Modifier.height(Dimens.SpacingMedium))
-
-                Box(modifier = Modifier.fillMaxSize()) {
-                    when (val state = uiState) {
-                        is RestaurantDiscoveryUiState.Empty -> EmptyResultsContent()
-                        is RestaurantDiscoveryUiState.Error -> ErrorResultsContent(message = state.message)
-                        is RestaurantDiscoveryUiState.Success -> SuccessResultsContent(
-                            state = state,
-                            onIntent = viewModel::onIntent,
-                            onNavigateTo = navigator::navigateTo
-                        )
-                        else -> {}
-                    }
+                when (val state = uiState) {
+                    is RestaurantDiscoveryUiState.Empty -> EmptyResultsContent()
+                    is RestaurantDiscoveryUiState.Error -> ErrorResultsContent(message = state.message)
+                    is RestaurantDiscoveryUiState.Success -> SuccessResultsContent(
+                        state = state,
+                        onIntent = viewModel::onIntent,
+                        onNavigateTo = navigator::navigateTo
+                    )
+                    else -> {}
                 }
             }
+        }
 
-            when {
-                uiState is RestaurantDiscoveryUiState.Loading -> LoadingResultsContent()
-                isKeyboardVisible -> KeyboardVisibleContentMask()
-                else -> {}
-            }
+        when {
+            uiState is RestaurantDiscoveryUiState.Loading -> MrDScreenLoader()
+            isKeyboardVisible -> KeyboardVisibleContentMask()
+            else -> {}
         }
     }
 }
@@ -165,13 +145,6 @@ private fun EmptyResultsContent() {
 }
 
 @Composable
-private fun LoadingResultsContent() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        CircularProgressIndicator()
-    }
-}
-
-@Composable
 private fun ErrorResultsContent(message: String) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Text("Error: $message")
@@ -207,7 +180,7 @@ private fun SuccessResultsContent(
                 val restaurant = state.restaurants[index]
                 RestaurantItem(
                     modifier = Modifier.clickable {
-                        onNavigateTo(FeatureNavKey.RestaurantDetails)
+                        onNavigateTo(FeatureNavKey.RestaurantDetails(restaurant.id))
                     },
                     restaurant = restaurant
                 )
@@ -239,7 +212,7 @@ private fun RestaurantItem(
     Column(modifier = modifier
         .padding(vertical = Dimens.SpacingSmall)
     ) {
-        RestaurantImage(
+        RemoteImage(
             modifier = Modifier.padding(bottom = Dimens.SpacingSmall),
             imageUrl = restaurant.imageUrl
         )
@@ -251,64 +224,4 @@ private fun RestaurantItem(
         )
     }
 
-}
-
-@Composable
-private fun RestaurantImage(
-    modifier: Modifier = Modifier,
-    imageUrl: String
-) {
-    AsyncImage(
-        model = imageUrl,
-        contentDescription = null,
-        contentScale = ContentScale.Crop,
-        modifier = modifier
-            .shimmerEffect()
-            .fillMaxWidth()
-            .aspectRatio(16f / 9f)
-            .height(150.dp)
-    )
-}
-
-private fun Modifier.shimmerEffect(): Modifier = composed {
-    val transition = rememberInfiniteTransition(label = "ShimmerTransition")
-    val translateAnim = transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1000f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1000, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-        ),
-        label = "ShimmerAnim"
-    )
-
-    val shimmerColors = listOf(
-        Color.LightGray.copy(alpha = 0.6f),
-        Color.LightGray.copy(alpha = 0.2f),
-        Color.LightGray.copy(alpha = 0.6f)
-    )
-
-    background(
-        brush = Brush.linearGradient(
-            colors = shimmerColors,
-            start = Offset.Zero,
-            end = Offset(x = translateAnim.value, y = translateAnim.value)
-        )
-    )
-}
-
-@Composable
-private fun KeyboardVisibleContentMask() {
-    val focusManager = LocalFocusManager.current
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.4f))
-            .clickable(
-                indication = null,
-                interactionSource = remember { MutableInteractionSource() }
-            ) {
-                focusManager.clearFocus()
-            }
-    )
 }

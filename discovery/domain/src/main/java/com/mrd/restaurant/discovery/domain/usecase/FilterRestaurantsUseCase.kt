@@ -10,7 +10,7 @@ import com.mrd.restaurant.discovery.core.primitive.model.Pagination
 import com.mrd.restaurant.discovery.core.primitive.model.PagedResult
 
 class FilterRestaurantsUseCase(
-    private val restaurantsRepository: RestaurantsRepository,
+    private val repository: RestaurantsRepository,
     private val logger: Logger
 ) {
 
@@ -27,7 +27,7 @@ class FilterRestaurantsUseCase(
                 }
             }.toSet()
             logger.log("Sanitize restaurants filters: $sanitizedFilters")
-            val result = restaurantsRepository.filterRestaurants(
+            val result = repository.filterRestaurants(
                 filters = RestaurantFilters(sanitizedFilters),
                 pagination = pagination
             )

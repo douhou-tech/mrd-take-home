@@ -6,12 +6,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 sealed interface FeatureNavKey : NavKey {
-
     @Serializable
     data object RestaurantDiscovery : FeatureNavKey
-
     @Serializable
-    data object RestaurantDetails : FeatureNavKey
+    data class RestaurantDetails(val id: String) : FeatureNavKey
 }
 
 interface  FeatureNavigator: BackNavigator {

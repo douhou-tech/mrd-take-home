@@ -6,10 +6,14 @@ import timber.log.Timber
 class ConsoleLogger : Logger {
 
     override fun log(message: String) {
-        Timber.d(message)
+        Timber.tag(TAG).i(message)
     }
 
     override fun error(message: String, throwable: Throwable?) {
-        Timber.e(throwable, message)
+        Timber.tag(TAG).e(throwable, message)
+    }
+
+    companion object {
+        const val TAG = "ConsoleLogger"
     }
 }

@@ -6,11 +6,14 @@ import com.mrd.restaurant.discovery.core.primitive.model.PagedResult
 import com.mrd.restaurant.discovery.core.primitive.model.Pagination
 import com.mrd.restaurant.discovery.data.persistence.dao.RestaurantDao
 import com.mrd.restaurant.discovery.data.persistence.model.RestaurantEntity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlin.math.max
 
 interface LocalRestaurantsDataSource {
     suspend fun getRestaurants(filters: RestaurantFilters, pagination: Pagination): PagedResult<RestaurantEntity>
     suspend fun upsertRestaurants(restaurants: List<RestaurantEntity>)
+    suspend fun getRestaurant(id: String): RestaurantEntity
 }
 
 class LocalRestaurantsDataSourceImpl(
@@ -30,24 +33,34 @@ class LocalRestaurantsDataSourceImpl(
             else -> true
         }
         val offset = max(0, pagination.page * pagination.pageSize)
-        val result = restaurantDao.getRestaurants(
-            query = queryFilter?.query,
-            isOpen = isOpen,
-            pageSize = pagination.pageSize,
-            offset = offset
-        )
-        val items = result.map { it.restaurant }
-        val totalCount = result.firstOrNull()?.totalCount ?: 0
-        return PagedResult(
-            items = items,
-            currentPage = pagination.page,
-            pageSize = pagination.pageSize,
-            totalCount = totalCount
-        )
+        return withContext(Dispatchers.IO) {
+            val result = restaurantDao.getRestaurants(
+                query = queryFilter?.query,
+                isOpen = isOpen,
+                pageSize = pagination.pageSize,
+                offset = offset
+            )
+            val items = result.map { it.restaurant }
+            val totalCount = result.firstOrNull()?.totalCount ?: 0
+            PagedResult(
+                items = items,
+                currentPage = pagination.page,
+                pageSize = pagination.pageSize,
+                totalCount = totalCount
+            )
+        }
     }
 
     override suspend fun upsertRestaurants(restaurants: List<RestaurantEntity>) {
-        restaurantDao.upsertRestaurants(restaurants)
+        withContext(Dispatchers.IO) {
+            restaurantDao.upsertRestaurants(restaurants)
+        }
+    }
+
+    override suspend fun getRestaurant(id: String): RestaurantEntity {
+        return withContext(Dispatchers.IO) {
+            restaurantDao.getRestaurant(id)
+        }
     }
 
 }

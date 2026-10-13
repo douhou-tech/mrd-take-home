@@ -33,5 +33,14 @@ class RestaurantsRepositoryImpl(
         )
     }
 
+    override suspend fun getRestaurant(id: String): Restaurant? {
+        val remoteResult = remoteDataSource.getRestaurant(id)
+        return remoteResult?.toEntity()?.let { entity ->
+            localDataSource.upsertRestaurants(listOf(entity))
+            val localResult  = localDataSource.getRestaurant(id)
+            localResult.toDomain()
+        }
+    }
+
 }
 

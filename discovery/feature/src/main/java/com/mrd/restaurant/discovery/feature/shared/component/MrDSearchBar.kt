@@ -1,4 +1,4 @@
-package com.mrd.restaurant.discovery.feature.component
+package com.mrd.restaurant.discovery.feature.shared.component
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.input.TextFieldState

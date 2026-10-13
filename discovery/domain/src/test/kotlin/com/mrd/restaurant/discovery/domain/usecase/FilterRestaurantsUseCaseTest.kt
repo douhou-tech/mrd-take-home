@@ -19,9 +19,9 @@ import org.koin.test.KoinTest
 
 class FilterRestaurantsUseCaseTest : KoinTest {
 
-    private val restaurantsRepository = mockk<RestaurantsRepository>()
+    private val repository = mockk<RestaurantsRepository>()
     private val logger = mockk<Logger>(relaxed = true)
-    private val subject = FilterRestaurantsUseCase(restaurantsRepository, logger)
+    private val subject = FilterRestaurantsUseCase(repository, logger)
 
     @Test
     fun `when invoke then call repository should be called with correct parameters`() = runTest {
@@ -30,7 +30,7 @@ class FilterRestaurantsUseCaseTest : KoinTest {
 
         subject(filters, pagination)
 
-        coVerify { restaurantsRepository.filterRestaurants(eq(filters), eq(pagination)) }
+        coVerify { repository.filterRestaurants(eq(filters), eq(pagination)) }
     }
 
     @Test
@@ -40,7 +40,7 @@ class FilterRestaurantsUseCaseTest : KoinTest {
         )
         val filtersSlot = slot<RestaurantFilters>()
         val pagination = mockk<Pagination>()
-        coEvery { restaurantsRepository.filterRestaurants(capture(filtersSlot), any()) }
+        coEvery { repository.filterRestaurants(capture(filtersSlot), any()) }
 
         subject(filters, pagination)
 
@@ -53,7 +53,7 @@ class FilterRestaurantsUseCaseTest : KoinTest {
         val filters = RestaurantFilters()
         val pagination = mockk<Pagination>()
         val data = mockk<PagedResult<Restaurant>>()
-        coEvery { restaurantsRepository.filterRestaurants(eq(filters), eq(pagination)) } returns data
+        coEvery { repository.filterRestaurants(eq(filters), eq(pagination)) } returns data
 
         val actual = subject(filters, pagination)
 
@@ -65,11 +65,13 @@ class FilterRestaurantsUseCaseTest : KoinTest {
         val filters = RestaurantFilters()
         val pagination = mockk<Pagination>()
         coEvery {
-            restaurantsRepository.filterRestaurants(eq(filters), eq(pagination))
+            repository.filterRestaurants(eq(filters), eq(pagination))
         } throws mockk<Exception>()
 
         val actual = subject(filters, pagination)
 
         actual shouldBeEqual EitherResult.Error(FilterRestaurantsUseCase.Error.Unknown)
     }
+
+
 }

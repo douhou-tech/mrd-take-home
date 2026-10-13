@@ -5,6 +5,7 @@ import com.mrd.restaurant.discovery.domain.repository.RestaurantFilters
 import com.mrd.restaurant.discovery.core.primitive.model.PagedResult
 import com.mrd.restaurant.discovery.core.primitive.model.Pagination
 import com.mrd.restaurant.discovery.data.remote.model.RestaurantRemoteModel
+import com.mrd.restaurant.discovery.domain.usecase.FetchRestaurantByIdUseCase
 import kotlinx.serialization.json.Json
 import kotlin.math.max
 import kotlin.math.min
@@ -14,6 +15,8 @@ interface RemoteRestaurantsDataSource {
         filters: RestaurantFilters = RestaurantFilters(),
         pagination: Pagination = Pagination(page = 0, pageSize = 20),
     ): PagedResult<RestaurantRemoteModel>
+
+    fun getRestaurant(id: String): RestaurantRemoteModel?
 }
 
 internal class MockRemoteRestaurantsDataSource(
@@ -63,5 +66,9 @@ internal class MockRemoteRestaurantsDataSource(
             pageSize = pageSize,
             totalCount = totalCount
         )
+    }
+
+    override fun getRestaurant(id: String): RestaurantRemoteModel? {
+        return allRestaurants.firstOrNull { it.id == id }
     }
 }

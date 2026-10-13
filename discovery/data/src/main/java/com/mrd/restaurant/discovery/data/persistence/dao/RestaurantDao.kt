@@ -30,4 +30,7 @@ interface RestaurantDao {
         offset: Int
     ): List<RestaurantEntityPagedResult>
 
+    @Query("SELECT * FROM Restaurant WHERE id = :id LIMIT 1")
+    fun getRestaurant(id: String): RestaurantEntity
+
 }
