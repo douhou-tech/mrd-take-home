@@ -6,12 +6,14 @@ import androidx.lifecycle.viewModelScope
 import com.mrd.restaurant.discovery.core.primitive.model.EitherResult
 import com.mrd.restaurant.discovery.domain.model.Restaurant
 import com.mrd.restaurant.discovery.domain.usecase.FetchRestaurantByIdUseCase
+import com.mrd.restaurant.discovery.feature.navigation.FeatureNavigator
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class RestaurantDetailsViewModel(
+    private val navigator: FeatureNavigator,
     private val fetchRestaurantByIdUseCase: FetchRestaurantByIdUseCase,
     private val restaurantId: String,
 ) : ViewModel() {
@@ -24,6 +26,13 @@ class RestaurantDetailsViewModel(
     }
 
     fun onIntent(intent: RestaurantDetailsIntent) {
+        when (intent) {
+            RestaurantDetailsIntent.Back -> onBack()
+        }
+    }
+
+    private fun onBack() {
+        navigator.navigateBack()
     }
 
     private fun loadRestaurant() {
@@ -48,7 +57,9 @@ class RestaurantDetailsViewModel(
     }
 }
 
-sealed interface RestaurantDetailsIntent
+sealed interface RestaurantDetailsIntent {
+    data object Back : RestaurantDetailsIntent
+}
 
 sealed interface RestaurantDetailsUiState {
     data object Loading : RestaurantDetailsUiState

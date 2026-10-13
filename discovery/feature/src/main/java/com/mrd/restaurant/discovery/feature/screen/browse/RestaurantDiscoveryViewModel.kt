@@ -9,6 +9,8 @@ import com.mrd.restaurant.discovery.domain.repository.RestaurantFilters
 import com.mrd.restaurant.discovery.domain.usecase.FilterRestaurantsUseCase
 import com.mrd.restaurant.discovery.core.primitive.model.EitherResult
 import com.mrd.restaurant.discovery.core.primitive.model.Pagination
+import com.mrd.restaurant.discovery.feature.navigation.FeatureNavKey
+import com.mrd.restaurant.discovery.feature.navigation.FeatureNavigator
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,6 +18,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class RestaurantDiscoveryViewModel(
+    private val navigator: FeatureNavigator,
     private val filterRestaurantsUseCase: FilterRestaurantsUseCase,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -53,35 +56,45 @@ class RestaurantDiscoveryViewModel(
 
     fun onIntent(intent: RestaurantDiscoveryIntent) {
         when (intent) {
-            is RestaurantDiscoveryIntent.SearchQueryChanged -> {
-                if (query != intent.query) {
-                    query = intent.query
-                    currentPage = 0
-                    _filterState.update {
-                        it.copy(query = query)
-                    }
-                    loadRestaurants()
-                }
-            }
-            is RestaurantDiscoveryIntent.ToggleOpenNow -> {
-                if (isOpenNow != intent.isOpenNow) {
-                    isOpenNow = intent.isOpenNow
-                    _filterState.update {
-                        it.copy(isOpenNow = isOpenNow)
-                    }
-                    currentPage = 0
-                    loadRestaurants()
-                }
-            }
-            RestaurantDiscoveryIntent.LoadMore -> {
-                val uiState = _uiState.value
-                val filterState = _filterState.value
-                if (uiState is RestaurantDiscoveryUiState.Success) {
-                    if ((currentPage + 1) * pageSize < filterState.totalCount) {
-                        loadMoreRestaurants(uiState)
-                    }
-                }
-            }
+            is RestaurantDiscoveryIntent.NavigateToDetails -> onNavigateToDetails(intent.restaurant)
+            is RestaurantDiscoveryIntent.SearchQueryChanged -> onSearchQueryChange(intent.query)
+            is RestaurantDiscoveryIntent.ToggleOpenNow -> onToggleOpenNow(intent.isOpenNow)
+            RestaurantDiscoveryIntent.LoadMore -> onLoadMore()
+        }
+    }
+
+    private fun onNavigateToDetails(restaurant: Restaurant) {
+        navigator.navigateTo(FeatureNavKey.RestaurantDetails(restaurant.id))
+    }
+
+    private fun onSearchQueryChange(query: String) {
+        if (this.query == query) return
+
+        this.query = query
+        currentPage = 0
+        _filterState.update {
+            it.copy(query = query)
+        }
+        loadRestaurants()
+    }
+
+    private fun onToggleOpenNow(isOpenNow: Boolean) {
+        if (this.isOpenNow == isOpenNow) return
+
+        this.isOpenNow = isOpenNow
+        _filterState.update {
+            it.copy(isOpenNow = isOpenNow)
+        }
+        currentPage = 0
+        loadRestaurants()
+    }
+
+    private fun onLoadMore() {
+        val uiState = _uiState.value
+        if (uiState !is RestaurantDiscoveryUiState.Success) return
+        val filterState = _filterState.value
+        if ((currentPage + 1) * pageSize < filterState.totalCount) {
+            loadMoreRestaurants(uiState)
         }
     }
 
@@ -171,6 +184,7 @@ class RestaurantDiscoveryViewModel(
 }
 
 sealed interface RestaurantDiscoveryIntent {
+    data class NavigateToDetails(val restaurant: Restaurant) : RestaurantDiscoveryIntent
     data class SearchQueryChanged(val query: String) : RestaurantDiscoveryIntent
     data class ToggleOpenNow(val isOpenNow: Boolean) : RestaurantDiscoveryIntent
     data object LoadMore : RestaurantDiscoveryIntent

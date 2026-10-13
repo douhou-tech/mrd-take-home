@@ -30,21 +30,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.mrd.restaurant.discovery.domain.model.Restaurant
-import com.mrd.restaurant.discovery.feature.navigation.FeatureNavKey
-import com.mrd.restaurant.discovery.feature.navigation.FeatureNavigator
 import com.mrd.restaurant.discovery.feature.shared.component.KeyboardVisibleContentMask
 import com.mrd.restaurant.discovery.feature.shared.component.MrDScreenLoader
 import com.mrd.restaurant.discovery.feature.shared.component.MrDSearchBar
 import com.mrd.restaurant.discovery.feature.shared.component.RemoteImage
 import com.mrd.restaurant.discovery.feature.shared.container.MrDScreenScaffold
 import com.mrd.restaurant.discovery.feature.ui.Dimens
-import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun RestaurantDiscoveryScreen(
-    viewModel: RestaurantDiscoveryViewModel = koinViewModel(),
-    navigator: FeatureNavigator,
+    viewModel: RestaurantDiscoveryViewModel
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val filterState by viewModel.filterState.collectAsState()
@@ -85,8 +81,7 @@ fun RestaurantDiscoveryScreen(
                     is RestaurantDiscoveryUiState.Error -> ErrorResultsContent(message = state.message)
                     is RestaurantDiscoveryUiState.Success -> SuccessResultsContent(
                         state = state,
-                        onIntent = viewModel::onIntent,
-                        onNavigateTo = navigator::navigateTo
+                        onIntent = viewModel::onIntent
                     )
                     else -> {}
                 }
@@ -155,8 +150,7 @@ private fun ErrorResultsContent(message: String) {
 private fun SuccessResultsContent(
     modifier: Modifier = Modifier,
     state: RestaurantDiscoveryUiState.Success,
-    onIntent: (RestaurantDiscoveryIntent) -> Unit,
-    onNavigateTo: (FeatureNavKey) -> Unit
+    onIntent: (RestaurantDiscoveryIntent) -> Unit
 ) {
     val listState = rememberLazyListState()
     val shouldLoadMore by remember {
@@ -180,7 +174,7 @@ private fun SuccessResultsContent(
                 val restaurant = state.restaurants[index]
                 RestaurantItem(
                     modifier = Modifier.clickable {
-                        onNavigateTo(FeatureNavKey.RestaurantDetails(restaurant.id))
+                        onIntent(RestaurantDiscoveryIntent.NavigateToDetails(restaurant))
                     },
                     restaurant = restaurant
                 )

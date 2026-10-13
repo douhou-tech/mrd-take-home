@@ -17,7 +17,7 @@ val restaurantDiscoveryFeatureModule = module {
     viewModelOf(::RestaurantDiscoveryViewModel)
     navigation<FeatureNavKey.RestaurantDiscovery> {
         RestaurantDiscoveryScreen(
-            navigator = get()
+            viewModel = koinViewModel()
         )
     }
 }
@@ -31,7 +31,6 @@ val restaurantDetailsFeatureModule = module {
             viewModel = koinViewModel {
                 parametersOf(restaurantId)
             },
-            navigator = get(),
         )
     }
 }
