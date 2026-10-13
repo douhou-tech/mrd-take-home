@@ -69,5 +69,6 @@ dependencies {
 
     // Navigation
     implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.androidx.navigation3.viewmodel)
     implementation(libs.androidx.navigation3.ui)
 }
