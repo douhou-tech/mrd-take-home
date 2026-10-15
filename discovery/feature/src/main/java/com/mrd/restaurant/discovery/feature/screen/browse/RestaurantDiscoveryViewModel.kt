@@ -3,20 +3,27 @@ package com.mrd.restaurant.discovery.feature.screen.browse
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mrd.restaurant.discovery.core.primitive.model.EitherResult
+import com.mrd.restaurant.discovery.core.primitive.model.Pagination
 import com.mrd.restaurant.discovery.domain.model.Restaurant
 import com.mrd.restaurant.discovery.domain.repository.RestaurantFilter
 import com.mrd.restaurant.discovery.domain.repository.RestaurantFilters
 import com.mrd.restaurant.discovery.domain.usecase.FilterRestaurantsUseCase
-import com.mrd.restaurant.discovery.core.primitive.model.EitherResult
-import com.mrd.restaurant.discovery.core.primitive.model.Pagination
 import com.mrd.restaurant.discovery.feature.navigation.FeatureNavKey
 import com.mrd.restaurant.discovery.feature.navigation.FeatureNavigator
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
+@OptIn(FlowPreview::class)
 class RestaurantDiscoveryViewModel(
     private val navigator: FeatureNavigator,
     private val filterRestaurantsUseCase: FilterRestaurantsUseCase,
@@ -49,9 +56,30 @@ class RestaurantDiscoveryViewModel(
     )
     val uiState: StateFlow<RestaurantDiscoveryUiState> = _uiState.asStateFlow()
     val filterState: StateFlow<RestaurantDiscoveryFilterState> = _filterState.asStateFlow()
+    private val filterFlow = filterState
+        .distinctUntilChanged { a, b ->
+            a.query == b.query && a.isOpenNow == b.isOpenNow
+        }
+        .debounce(300L.milliseconds)
+        .stateIn(
+            viewModelScope,
+           kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(1000L),
+            filterState
+        )
 
     init {
         loadRestaurants()
+        setupInputChangeFlows()
+    }
+
+    private fun setupInputChangeFlows() {
+        viewModelScope.launch {
+            launch {
+                filterFlow.collectLatest {
+                    loadRestaurants()
+                }
+            }
+        }
     }
 
     fun onIntent(intent: RestaurantDiscoveryIntent) {
@@ -75,7 +103,6 @@ class RestaurantDiscoveryViewModel(
         _filterState.update {
             it.copy(query = query)
         }
-        loadRestaurants()
     }
 
     private fun onToggleOpenNow(isOpenNow: Boolean) {
@@ -86,7 +113,6 @@ class RestaurantDiscoveryViewModel(
             it.copy(isOpenNow = isOpenNow)
         }
         currentPage = 0
-        loadRestaurants()
     }
 
     private fun onLoadMore() {
@@ -107,23 +133,14 @@ class RestaurantDiscoveryViewModel(
             val nextState = when (val result = filterRestaurantsUseCase(filters(), pagination())) {
                 is EitherResult.Success -> {
                     val paged = result.data
+                    _filterState.update {
+                        it.copy(totalCount = paged.totalCount)
+                    }
                     if (paged.items.isEmpty()) {
-                        _filterState.update {
-                            it.copy(
-                                totalCount = 0
-                            )
-                        }
                         RestaurantDiscoveryUiState.Empty
                     } else {
-                        _filterState.update {
-                            it.copy(
-                                totalCount = paged.totalCount
-                            )
-                        }
                         RestaurantDiscoveryUiState.Success(
-                            restaurants = paged.items,
-                            currentPage = paged.currentPage,
-                            pageSize = paged.pageSize,
+                            restaurants = paged.items
                         )
                     }
                 }
@@ -148,8 +165,6 @@ class RestaurantDiscoveryViewModel(
                         currentPage += 1
                         state.copy(
                             restaurants = state.restaurants + paged.items,
-                            currentPage = paged.currentPage,
-                            pageSize = paged.pageSize,
                             isLoadingMore = false
                         )
                     } else null
@@ -202,8 +217,6 @@ sealed interface RestaurantDiscoveryUiState {
 
     data class Success(
         val restaurants: List<Restaurant>,
-        val currentPage: Int,
-        val pageSize: Int,
         val isLoadingMore: Boolean = false
     ) : RestaurantDiscoveryUiState
 
