@@ -1,7 +1,14 @@
 package com.mrd.restaurant.discovery.feature.screen.browse
 
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -17,6 +24,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.TextFieldLineLimits
@@ -35,7 +43,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,11 +62,41 @@ import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun RestaurantDiscoveryScreen(
-    viewModel: RestaurantDiscoveryViewModel
+    viewModel: RestaurantDiscoveryViewModel,
+    sharedTransitionScope: SharedTransitionScope,
+    visibilityScope: AnimatedContentScope
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val filterState by viewModel.filterState.collectAsState()
+    val listState = rememberLazyListState()
+    val shouldLoadMore by remember {
+        derivedStateOf {
+            val state = uiState
+            if (state !is RestaurantDiscoveryUiState.Success) return@derivedStateOf false
+            val lastVisibleItemIndex =
+                listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            val totalItemsCount = listState.layoutInfo.totalItemsCount
+            lastVisibleItemIndex >= totalItemsCount - 3 && totalItemsCount > 0 && !state.isLoadingMore // TODO: Add threshold as a ui config value
+        }
+    }
+    var previousHideFilters by remember { mutableStateOf(false) }
+    val shouldShowFilters by remember {
+        derivedStateOf {
+            if (listState.isScrollInProgress) {
+                when {
+                    listState.lastScrolledForward -> true
+                    else -> false
+                }
+            } else {
+                previousHideFilters
+            }
+        }
+    }
+    previousHideFilters = shouldShowFilters
 
+    LaunchedEffect(shouldLoadMore) {
+        if (shouldLoadMore) viewModel.onIntent(RestaurantDiscoveryIntent.LoadMore)
+    }
 
     MrDScreenScaffold(
         topBar = {
@@ -67,19 +107,24 @@ fun RestaurantDiscoveryScreen(
                 .padding(horizontal = Dimens.SpacingMedium)
                 .fillMaxSize()
         ) {
-            RestaurantFilterSection(
-                isOpenNow = filterState.isOpenNow,
-                totalCount = filterState.totalCount,
-                onToggleOpenNow = {
-                    viewModel.onIntent(RestaurantDiscoveryIntent.ToggleOpenNow(it))
-                }
-            )
+            AnimatedVisibility(!shouldShowFilters) {
+                RestaurantFilterSection(
+                    isOpenNow = filterState.isOpenNow,
+                    totalCount = filterState.totalCount,
+                    onToggleOpenNow = {
+                        viewModel.onIntent(RestaurantDiscoveryIntent.ToggleOpenNow(it))
+                    }
+                )
+            }
 
             Box(modifier = Modifier.fillMaxSize()) {
                 when (val state = uiState) {
                     is RestaurantDiscoveryUiState.Empty -> EmptyResultsContent()
                     is RestaurantDiscoveryUiState.Error -> ErrorResultsContent(message = state.message)
                     is RestaurantDiscoveryUiState.Success -> RestaurantDiscoveryContent(
+                        listState = listState,
+                        sharedTransitionScope = sharedTransitionScope,
+                        visibilityScope = visibilityScope,
                         state = state,
                         onIntent = viewModel::onIntent
                     )
@@ -96,6 +141,7 @@ fun RestaurantDiscoveryScreen(
 
         RestaurantSearchContent(
             query = filterState.query,
+            showSearch = !shouldShowFilters,
             onQueryChanged = {
                 viewModel.onIntent(RestaurantDiscoveryIntent.SearchQueryChanged(it))
             }
@@ -108,6 +154,7 @@ fun RestaurantDiscoveryScreen(
 @Composable
 private fun RestaurantSearchContent(
     query: String,
+    showSearch: Boolean,
     onQueryChanged: (String) -> Unit
 ) {
     val state = rememberTextFieldState(initialText = query)
@@ -129,40 +176,51 @@ private fun RestaurantSearchContent(
     Box(
         modifier = Modifier
             .fillMaxSize(),
+        contentAlignment = Alignment.BottomCenter,
     ) {
         KeyboardVisibleContentMask()
 
-        OutlinedTextField(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .imePadding()
-                .padding(vertical = Dimens.SpacingSmall)
-                .clip(RoundedCornerShape(32.dp))
-                .background(Color(0xFFFAFAFA))
-                .fillMaxWidth(width),
-            state = state,
-            shape = RoundedCornerShape(32.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFF6dcff4),
-                unfocusedBorderColor = Color.Transparent,
-                focusedTextColor = Color.DarkGray,
-                unfocusedTextColor = Color.DarkGray,
-            ),
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = null,
-                    tint = Color.DarkGray
-                )
-            },
-            placeholder = {
-                Text(
-                    text = "Search restaurants",
-                    color = Color.DarkGray
-                )
-            },
-            lineLimits = TextFieldLineLimits.SingleLine
-        )
+        AnimatedVisibility(
+            showSearch,
+            Modifier.align(Alignment.BottomCenter),
+            enter = slideInVertically {
+                fullHeight -> fullHeight
+            } + fadeIn(),
+            exit = slideOutVertically {
+                fullHeight -> fullHeight
+            } + fadeOut()
+        ) {
+            OutlinedTextField(
+                modifier = Modifier
+                    .imePadding()
+                    .padding(vertical = Dimens.SpacingSmall)
+                    .clip(RoundedCornerShape(32.dp))
+                    .background(Color(0xFFFAFAFA))
+                    .fillMaxWidth(width),
+                state = state,
+                shape = RoundedCornerShape(32.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color(0xFF6dcff4),
+                    unfocusedBorderColor = Color.Transparent,
+                    focusedTextColor = Color.DarkGray,
+                    unfocusedTextColor = Color.DarkGray,
+                ),
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = null,
+                        tint = Color.DarkGray
+                    )
+                },
+                placeholder = {
+                    Text(
+                        text = "Search restaurants",
+                        color = Color.DarkGray
+                    )
+                },
+                lineLimits = TextFieldLineLimits.SingleLine
+            )
+        }
     }
 }
 
@@ -203,22 +261,12 @@ private fun ErrorResultsContent(message: String) {
 @Composable
 private fun RestaurantDiscoveryContent(
     modifier: Modifier = Modifier,
+    listState: LazyListState = rememberLazyListState(),
+    sharedTransitionScope: SharedTransitionScope,
+    visibilityScope: AnimatedContentScope,
     state: RestaurantDiscoveryUiState.Success,
-    onIntent: (RestaurantDiscoveryIntent) -> Unit
+    onIntent: (RestaurantDiscoveryIntent) -> Unit,
 ) {
-    val listState = rememberLazyListState()
-    val shouldLoadMore by remember {
-        derivedStateOf {
-            val lastVisibleItemIndex =
-                listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-            val totalItemsCount = listState.layoutInfo.totalItemsCount
-            lastVisibleItemIndex >= totalItemsCount - 3 && totalItemsCount > 0 && !state.isLoadingMore // TODO: Add threshold as a ui config value
-        }
-    }
-
-    LaunchedEffect(shouldLoadMore) {
-        if (shouldLoadMore) onIntent(RestaurantDiscoveryIntent.LoadMore)
-    }
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -231,6 +279,8 @@ private fun RestaurantDiscoveryContent(
                 modifier = Modifier.clickable {
                     onIntent(RestaurantDiscoveryIntent.NavigateToDetails(restaurant))
                 },
+                sharedTransitionScope = sharedTransitionScope,
+                visibilityScope = visibilityScope,
                 restaurant = restaurant
             )
             if (index != restaurants.lastIndex) {
@@ -255,6 +305,8 @@ private fun RestaurantDiscoveryContent(
 @Composable
 private fun RestaurantItem(
     modifier: Modifier = Modifier,
+    sharedTransitionScope: SharedTransitionScope,
+    visibilityScope: AnimatedContentScope,
     restaurant: Restaurant
 ) {
     Column(
@@ -262,17 +314,23 @@ private fun RestaurantItem(
             .padding(vertical = Dimens.SpacingSmall)
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            RemoteImage(
-                modifier = Modifier
-                    .clip(
-                        RoundedCornerShape(
-                            topStart = Dimens.SpacingSmall,
-                            topEnd = Dimens.SpacingSmall,
+            with (sharedTransitionScope) {
+                RemoteImage(
+                    modifier = Modifier
+                        .sharedElement(
+                            sharedTransitionScope.rememberSharedContentState(key = restaurant.id),
+                            animatedVisibilityScope = visibilityScope
                         )
-                    )
-                    .padding(bottom = Dimens.SpacingSmall),
-                imageUrl = restaurant.imageUrl
-            )
+                        .clip(
+                            RoundedCornerShape(
+                                topStart = Dimens.SpacingSmall,
+                                topEnd = Dimens.SpacingSmall,
+                            )
+                        )
+                        .padding(bottom = Dimens.SpacingSmall),
+                    imageUrl = restaurant.imageUrl
+                )
+            }
             if (!restaurant.isOpen) {
                 Box(
                     modifier = Modifier

@@ -1,5 +1,7 @@
 package com.mrd.restaurant.discovery.feature.screen.details
 
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
@@ -11,7 +13,9 @@ import com.mrd.restaurant.discovery.feature.shared.container.MrDScreenScaffold
 
 @Composable
 fun RestaurantDetailsScreen(
-    viewModel: RestaurantDetailsViewModel
+    viewModel: RestaurantDetailsViewModel,
+    sharedTransitionScope: SharedTransitionScope,
+    visibilityScope: AnimatedContentScope
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -20,6 +24,8 @@ fun RestaurantDetailsScreen(
             is RestaurantDetailsUiState.Error -> Unit
             RestaurantDetailsUiState.Loading -> Unit
             is RestaurantDetailsUiState.Success -> RestaurantDetailsContent(
+                sharedTransitionScope = sharedTransitionScope,
+                visibilityScope = visibilityScope,
                 state = state
             )
         }
@@ -28,6 +34,8 @@ fun RestaurantDetailsScreen(
 
 @Composable
 private fun RestaurantDetailsContent(
+    sharedTransitionScope: SharedTransitionScope,
+    visibilityScope: AnimatedContentScope,
     state: RestaurantDetailsUiState.Success
 ) {
     val restaurant = state.restaurant
@@ -37,9 +45,15 @@ private fun RestaurantDetailsContent(
     ) {
 
         item {
-            RemoteImage(
-                imageUrl = restaurant.imageUrl
-            )
+            with(sharedTransitionScope) {
+                RemoteImage(
+                    modifier = Modifier.sharedElement(
+                        sharedTransitionScope.rememberSharedContentState(key = restaurant.id),
+                        animatedVisibilityScope = visibilityScope
+                    ),
+                    imageUrl = restaurant.imageUrl
+                )
+            }
         }
 
     }
