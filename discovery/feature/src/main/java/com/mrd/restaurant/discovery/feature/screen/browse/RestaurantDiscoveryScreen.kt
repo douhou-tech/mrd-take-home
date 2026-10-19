@@ -63,6 +63,8 @@ import com.mrd.restaurant.discovery.ui.component.RemoteImage
 import com.mrd.restaurant.discovery.ui.container.MrDScreenScaffold
 import kotlinx.coroutines.flow.collectLatest
 
+private const val LOAD_MORE_THRESHOLD = 5
+
 @Composable
 fun RestaurantDiscoveryScreen(
     viewModel: RestaurantDiscoveryViewModel,
@@ -79,7 +81,11 @@ fun RestaurantDiscoveryScreen(
             val lastVisibleItemIndex =
                 listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
             val totalItemsCount = listState.layoutInfo.totalItemsCount
-            lastVisibleItemIndex >= totalItemsCount - 3 && totalItemsCount > 0 && !state.isLoadingMore // TODO: Add threshold as a ui config value
+            when {
+                totalItemsCount <= 0 -> false
+                lastVisibleItemIndex + LOAD_MORE_THRESHOLD >= totalItemsCount -> !state.isLoadingMore
+                else -> false
+            }
         }
     }
     var previousHideFilters by remember { mutableStateOf(false) }

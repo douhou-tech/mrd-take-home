@@ -16,15 +16,31 @@ class RestaurantDetailsViewModel(
     private val navigator: FeatureNavigator,
     private val fetchRestaurantByIdUseCase: FetchRestaurantByIdUseCase,
     private val favouriteRestaurantDelegate: FavouriteRestaurantDelegate,
-    private val restaurantId: String,
+    private val params: Params
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<RestaurantDetailsUiState>(RestaurantDetailsUiState.Loading)
     val uiState: StateFlow<RestaurantDetailsUiState> = _uiState
 
+    val restaurantId: String
+
     init {
         setupFavouritesChangeFlow()
-        loadRestaurant()
+        when (params) {
+            is Params.ByData -> {
+                restaurantId = params.restaurant.id
+                _uiState.update {
+                    RestaurantDetailsUiState.Success(
+                        restaurant = params.restaurant,
+                        favourite = params.restaurant.favourite
+                    )
+                }
+            }
+            is Params.ById -> {
+                restaurantId = params.restaurantId
+                loadRestaurant()
+            }
+        }
     }
 
     private fun setupFavouritesChangeFlow() {
@@ -84,6 +100,11 @@ class RestaurantDetailsViewModel(
                 }
             }
         }
+    }
+
+    sealed interface Params {
+        data class ById(val restaurantId: String) : Params
+        data class ByData(val restaurant: Restaurant) : Params
     }
 }
 

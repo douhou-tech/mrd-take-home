@@ -111,7 +111,7 @@ class RestaurantDiscoveryViewModel(
     }
 
     private fun onNavigateToDetails(restaurant: Restaurant) {
-        navigator.navigateTo(FeatureNavKey.RestaurantDetails(restaurant.id))
+        navigator.navigateTo(FeatureNavKey.RestaurantDetails.ByData(restaurant))
     }
 
     private fun onSearchQueryChange(query: String) {

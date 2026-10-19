@@ -5,9 +5,11 @@ import com.mrd.restaurant.discovery.core.primitive.model.Pagination
 import com.mrd.restaurant.discovery.data.remote.model.RestaurantRemoteModel
 import com.mrd.restaurant.discovery.domain.repository.RestaurantFilter
 import com.mrd.restaurant.discovery.domain.repository.RestaurantFilters
+import kotlinx.coroutines.delay
 import kotlinx.serialization.json.Json
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.time.Duration.Companion.milliseconds
 
 interface RemoteRestaurantsDataSource {
     suspend fun getRestaurants(
@@ -15,7 +17,7 @@ interface RemoteRestaurantsDataSource {
         pagination: Pagination = Pagination(page = 0, pageSize = 20),
     ): PagedResult<RestaurantRemoteModel>
 
-    fun getRestaurant(id: String): RestaurantRemoteModel?
+    suspend fun getRestaurant(id: String): RestaurantRemoteModel?
 
     suspend fun setFavourite(restaurantId: String, favourite: Boolean)
 }
@@ -24,8 +26,13 @@ internal class MockRemoteRestaurantsDataSource(
     val restaurantsJson: String,
 ) : RemoteRestaurantsDataSource {
 
+    private val json = Json {
+        ignoreUnknownKeys = true
+        isLenient = true
+        encodeDefaults = true
+    }
     private val allRestaurants: List<RestaurantRemoteModel> by lazy {
-        Json.decodeFromString(restaurantsJson)
+        json.decodeFromString(restaurantsJson)
     }
 
     private val favouriteMap = mutableMapOf<String, Boolean>()
@@ -34,6 +41,7 @@ internal class MockRemoteRestaurantsDataSource(
         filters: RestaurantFilters,
         pagination: Pagination
     ): PagedResult<RestaurantRemoteModel> {
+        delay(1200L.milliseconds)
         var result = allRestaurants
         filters.filters.forEach { filter ->
             when (filter) {
@@ -71,7 +79,8 @@ internal class MockRemoteRestaurantsDataSource(
         )
     }
 
-    override fun getRestaurant(id: String): RestaurantRemoteModel? {
+    override suspend fun getRestaurant(id: String): RestaurantRemoteModel? {
+        delay(2000L.milliseconds)
         return allRestaurants.firstOrNull { it.id == id }
     }
 

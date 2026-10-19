@@ -34,7 +34,7 @@ class RestaurantsRepositoryImpl(
             items = domainItems,
             pageSize = localResult.pageSize,
             currentPage = localResult.currentPage,
-            totalCount = localResult.totalCount
+            totalCount = remoteResult.totalCount
         )
     }
 

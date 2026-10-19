@@ -43,13 +43,25 @@ val restaurantDiscoveryFeatureModule = module {
         )
     }
 
-    navigation<FeatureNavKey.RestaurantDetails> { args ->
-        val restaurantId = args.id
+    navigation<FeatureNavKey.RestaurantDetails.ByData> { args ->
         val sharedTransitionScope = LocalSharedTransitionScope.current
         val visibilityScope = LocalNavAnimatedContentScope.current
         RestaurantDetailsScreen(
             viewModel = koinViewModel {
-                parametersOf(restaurantId)
+                parametersOf(RestaurantDetailsViewModel.Params.ByData(args.restaurant))
+            },
+            sharedTransitionScope = sharedTransitionScope,
+            visibilityScope = visibilityScope
+        )
+    }
+
+    navigation<FeatureNavKey.RestaurantDetails.ById> { args ->
+        val restaurantId = args.restaurantId
+        val sharedTransitionScope = LocalSharedTransitionScope.current
+        val visibilityScope = LocalNavAnimatedContentScope.current
+        RestaurantDetailsScreen(
+            viewModel = koinViewModel {
+                parametersOf(RestaurantDetailsViewModel.Params.ById(restaurantId))
             },
             sharedTransitionScope = sharedTransitionScope,
             visibilityScope = visibilityScope
