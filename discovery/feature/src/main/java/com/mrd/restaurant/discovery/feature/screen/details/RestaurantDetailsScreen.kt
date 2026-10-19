@@ -31,7 +31,11 @@ import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -43,9 +47,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.delay
 import com.mrd.restaurant.discovery.ui.component.RemoteImage
 import com.mrd.restaurant.discovery.ui.container.MrDScreenScaffold
 import com.mrd.restaurant.discovery.ui.Dimens
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun RestaurantDetailsScreen(
@@ -77,6 +83,12 @@ private fun RestaurantDetailsContent(
     onIntent: (RestaurantDetailsIntent) -> Unit
 ) {
     val restaurant = state.restaurant
+    var isRevealed by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        delay(850L.milliseconds)
+        isRevealed = true
+    }
 
     LazyColumn(
         modifier = Modifier
@@ -87,12 +99,13 @@ private fun RestaurantDetailsContent(
         item {
             GradientShadowBox(
                 modifier = Modifier.fillMaxWidth(),
+                isRevealed = isRevealed,
                 overlayContent = {
                     AnimatedVisibility(
-                        true,
-                            enter = fadeIn(tween(1000)),
-                            exit = fadeOut(tween(500))
-                        ) {
+                        visible = isRevealed,
+                        enter = fadeIn(animationSpec = tween(500)),
+                        exit = fadeOut(animationSpec = tween(300))
+                    ) {
                         Row(
                             modifier = Modifier.fillMaxSize().zIndex(1f),
                             horizontalArrangement = Arrangement.SpaceBetween
@@ -222,37 +235,47 @@ private fun GradientShadowBox(
     modifier: Modifier = Modifier,
     shadowColor: Color = Color.Black.copy(alpha = 0.4f),
     shadowHeight: Dp = 48.dp,
+    isRevealed: Boolean = true,
     overlayContent: @Composable () -> Unit = {},
     content: @Composable () -> Unit
 ) {
     Box(modifier = modifier) {
         content()
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(shadowHeight)
-                .align(Alignment.TopCenter)
-                .zIndex(1f)
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(shadowColor, Color.Transparent)
-                    )
+        AnimatedVisibility(
+            visible = isRevealed,
+            enter = fadeIn(animationSpec = tween(500)),
+            exit = fadeOut(animationSpec = tween(300)),
+            modifier = Modifier.matchParentSize()
+        ) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(shadowHeight)
+                        .align(Alignment.TopCenter)
+                        .zIndex(1f)
+                        .background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(shadowColor, Color.Transparent)
+                            )
+                        )
                 )
-        )
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(shadowHeight)
-                .align(Alignment.BottomCenter)
-                .zIndex(1f)
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(Color.Transparent, shadowColor)
-                    )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(shadowHeight)
+                        .align(Alignment.BottomCenter)
+                        .zIndex(1f)
+                        .background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(Color.Transparent, shadowColor)
+                            )
+                        )
                 )
-        )
+            }
+        }
 
         overlayContent()
     }
