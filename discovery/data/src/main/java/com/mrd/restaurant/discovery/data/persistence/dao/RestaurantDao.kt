@@ -5,6 +5,7 @@ import androidx.room.Query
 import androidx.room.Upsert
 import com.mrd.restaurant.discovery.data.persistence.model.RestaurantEntity
 import com.mrd.restaurant.discovery.data.persistence.model.RestaurantEntityPagedResult
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface RestaurantDao {
@@ -39,5 +40,8 @@ interface RestaurantDao {
 
     @Query("UPDATE Restaurant SET favourite = :favourite WHERE id = :id")
     suspend fun updateFavourite(id: String, favourite: Boolean)
+
+    @Query("SELECT id FROM Restaurant WHERE favourite = 1")
+    fun observeFavouriteIds(): Flow<List<String>>
 
 }

@@ -7,10 +7,13 @@ import com.mrd.restaurant.discovery.data.persistence.model.RestaurantEntity
 import com.mrd.restaurant.discovery.domain.repository.RestaurantFilter
 import com.mrd.restaurant.discovery.domain.repository.RestaurantFilters
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import kotlin.math.max
 
 interface LocalRestaurantsDataSource {
+    fun observeFavouriteIds(): Flow<Set<String>>
     suspend fun getRestaurants(filters: RestaurantFilters, pagination: Pagination): PagedResult<RestaurantEntity>
     suspend fun upsertRestaurants(restaurants: List<RestaurantEntity>)
     suspend fun getRestaurant(id: String): RestaurantEntity
@@ -20,6 +23,10 @@ interface LocalRestaurantsDataSource {
 class LocalRestaurantsDataSourceImpl(
     private val restaurantDao: RestaurantDao
 ): LocalRestaurantsDataSource {
+
+    override fun observeFavouriteIds(): Flow<Set<String>> {
+        return restaurantDao.observeFavouriteIds().map { it.toSet() }
+    }
 
     override suspend fun getRestaurants(filters: RestaurantFilters, pagination: Pagination): PagedResult<RestaurantEntity> {
         val filters = filters.filters
@@ -57,8 +64,8 @@ class LocalRestaurantsDataSourceImpl(
             val ids = restaurants.map { it.id }
             val existing = restaurantDao.getRestaurantsByIds(ids).associateBy { it.id }
             val merged = restaurants.map { entity ->
-                val existingFavourite = existing[entity.id]?.favourite ?: existing[entity.id]?.wishlisted ?: false
-                entity.copy(favourite = entity.favourite || existingFavourite, wishlisted = entity.wishlisted || existingFavourite)
+                val existingFavourite = existing[entity.id]?.favourite ?: false
+                entity.copy(favourite = entity.favourite || existingFavourite)
             }
             restaurantDao.upsertRestaurants(merged)
         }

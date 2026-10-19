@@ -55,11 +55,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.mrd.restaurant.discovery.domain.model.Restaurant
+import com.mrd.restaurant.discovery.ui.Dimens
+import com.mrd.restaurant.discovery.ui.component.FavouriteIconButton
 import com.mrd.restaurant.discovery.ui.component.KeyboardVisibleContentMask
 import com.mrd.restaurant.discovery.ui.component.MrDScreenLoader
 import com.mrd.restaurant.discovery.ui.component.RemoteImage
 import com.mrd.restaurant.discovery.ui.container.MrDScreenScaffold
-import com.mrd.restaurant.discovery.ui.Dimens
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -277,16 +278,29 @@ private fun RestaurantDiscoveryContent(
         state = listState
     ) {
         val restaurants = state.restaurants
+        val favourites = state.favourites
         items(restaurants.size, key = { restaurants[it].id }) { index ->
             val restaurant = state.restaurants[index]
-            RestaurantItem(
-                modifier = Modifier.clickable {
-                    onIntent(RestaurantDiscoveryIntent.NavigateToDetails(restaurant))
-                },
-                sharedTransitionScope = sharedTransitionScope,
-                visibilityScope = visibilityScope,
-                restaurant = restaurant
-            )
+            Box(modifier = Modifier.fillMaxWidth()) {
+                RestaurantItem(
+                    modifier = Modifier.clickable {
+                        onIntent(RestaurantDiscoveryIntent.NavigateToDetails(restaurant))
+                    },
+                    sharedTransitionScope = sharedTransitionScope,
+                    visibilityScope = visibilityScope,
+                    restaurant = restaurant
+                )
+
+                FavouriteIconButton(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(top = Dimens.SpacingSmall),
+                    favourite = favourites.contains(restaurant.id),
+                    onClick = {
+                        onIntent(RestaurantDiscoveryIntent.ToggleFavourite(restaurant))
+                    }
+                )
+            }
             if (index != restaurants.lastIndex) {
                 Spacer(modifier = Modifier.height(Dimens.SpacingSmall))
             }

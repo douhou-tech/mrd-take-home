@@ -9,6 +9,7 @@ import com.mrd.restaurant.discovery.domain.model.Restaurant
 import com.mrd.restaurant.discovery.domain.repository.RestaurantFilter
 import com.mrd.restaurant.discovery.domain.repository.RestaurantFilters
 import com.mrd.restaurant.discovery.domain.usecase.FilterRestaurantsUseCase
+import com.mrd.restaurant.discovery.feature.favourite.FavouriteRestaurantDelegate
 import com.mrd.restaurant.discovery.feature.navigation.FeatureNavKey
 import com.mrd.restaurant.discovery.feature.navigation.FeatureNavigator
 import kotlinx.coroutines.FlowPreview
@@ -27,6 +28,7 @@ import kotlin.time.Duration.Companion.milliseconds
 class RestaurantDiscoveryViewModel(
     private val navigator: FeatureNavigator,
     private val filterRestaurantsUseCase: FilterRestaurantsUseCase,
+    private val favouriteRestaurantDelegate: FavouriteRestaurantDelegate,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -68,8 +70,9 @@ class RestaurantDiscoveryViewModel(
         )
 
     init {
-        loadRestaurants()
         setupInputChangeFlows()
+        setupFavouritesChangeFlow()
+        loadRestaurants()
     }
 
     private fun setupInputChangeFlows() {
@@ -82,11 +85,27 @@ class RestaurantDiscoveryViewModel(
         }
     }
 
+    private fun setupFavouritesChangeFlow() {
+        viewModelScope.launch {
+            favouriteRestaurantDelegate.favourites
+                .collect { favourites ->
+                    _uiState.update { state ->
+                        if (state is RestaurantDiscoveryUiState.Success) {
+                            state.copy(
+                                favourites = favourites
+                            )
+                        } else state
+                    }
+                }
+        }
+    }
+
     fun onIntent(intent: RestaurantDiscoveryIntent) {
         when (intent) {
             is RestaurantDiscoveryIntent.NavigateToDetails -> onNavigateToDetails(intent.restaurant)
             is RestaurantDiscoveryIntent.SearchQueryChanged -> onSearchQueryChange(intent.query)
             is RestaurantDiscoveryIntent.ToggleOpenNow -> onToggleOpenNow(intent.isOpenNow)
+            is RestaurantDiscoveryIntent.ToggleFavourite -> onToggleFavourite(intent.restaurant)
             RestaurantDiscoveryIntent.LoadMore -> onLoadMore()
         }
     }
@@ -113,6 +132,18 @@ class RestaurantDiscoveryViewModel(
             it.copy(isOpenNow = isOpenNow)
         }
         currentPage = 0
+    }
+
+    private fun onToggleFavourite(restaurant: Restaurant) {
+        val state = _uiState.value
+        if (state !is RestaurantDiscoveryUiState.Success) return
+
+        val current = state.favourites.contains(restaurant.id) || restaurant.favourite
+        favouriteRestaurantDelegate.toggleFavourite(
+            scope = viewModelScope,
+            restaurantId = restaurant.id,
+            favourite = current
+        )
     }
 
     private fun onLoadMore() {
@@ -163,8 +194,9 @@ class RestaurantDiscoveryViewModel(
                     val paged = result.data
                     if (paged.items.isNotEmpty()) {
                         currentPage += 1
+                        val restaurants = state.restaurants + paged.items
                         state.copy(
-                            restaurants = state.restaurants + paged.items,
+                            restaurants = restaurants,
                             isLoadingMore = false
                         )
                     } else null
@@ -202,6 +234,7 @@ sealed interface RestaurantDiscoveryIntent {
     data class NavigateToDetails(val restaurant: Restaurant) : RestaurantDiscoveryIntent
     data class SearchQueryChanged(val query: String) : RestaurantDiscoveryIntent
     data class ToggleOpenNow(val isOpenNow: Boolean) : RestaurantDiscoveryIntent
+    data class ToggleFavourite(val restaurant: Restaurant) : RestaurantDiscoveryIntent
     data object LoadMore : RestaurantDiscoveryIntent
 }
 
@@ -217,6 +250,7 @@ sealed interface RestaurantDiscoveryUiState {
 
     data class Success(
         val restaurants: List<Restaurant>,
+        val favourites: Set<String> = emptySet(),
         val isLoadingMore: Boolean = false
     ) : RestaurantDiscoveryUiState
 

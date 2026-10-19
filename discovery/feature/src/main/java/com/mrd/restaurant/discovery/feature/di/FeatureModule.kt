@@ -3,6 +3,8 @@ package com.mrd.restaurant.discovery.feature.di
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.runtime.compositionLocalOf
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
+import com.mrd.restaurant.discovery.feature.favourite.FavouriteRestaurantDelegate
+import com.mrd.restaurant.discovery.feature.favourite.FavouriteRestaurantDelegateImpl
 import com.mrd.restaurant.discovery.feature.navigation.FeatureNavKey
 import com.mrd.restaurant.discovery.feature.screen.browse.RestaurantDiscoveryScreen
 import com.mrd.restaurant.discovery.feature.screen.browse.RestaurantDiscoveryViewModel
@@ -21,7 +23,16 @@ val LocalSharedTransitionScope = compositionLocalOf<SharedTransitionScope> {
 
 @OptIn(KoinExperimentalAPI::class)
 val restaurantDiscoveryFeatureModule = module {
+    single<FavouriteRestaurantDelegate> {
+        FavouriteRestaurantDelegateImpl(
+            favouriteRestaurantUseCase = get(),
+            restaurantsRepository = get()
+        )
+    }
+
     viewModelOf(::RestaurantDiscoveryViewModel)
+    viewModelOf(::RestaurantDetailsViewModel)
+
     navigation<FeatureNavKey.RestaurantDiscovery> {
         val sharedTransitionScope = LocalSharedTransitionScope.current
         val visibilityScope = LocalNavAnimatedContentScope.current
@@ -31,11 +42,7 @@ val restaurantDiscoveryFeatureModule = module {
             visibilityScope = visibilityScope
         )
     }
-}
 
-@OptIn(KoinExperimentalAPI::class)
-val restaurantDetailsFeatureModule = module {
-    viewModelOf(::RestaurantDetailsViewModel)
     navigation<FeatureNavKey.RestaurantDetails> { args ->
         val restaurantId = args.id
         val sharedTransitionScope = LocalSharedTransitionScope.current

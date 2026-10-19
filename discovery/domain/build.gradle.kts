@@ -17,6 +17,7 @@ dependencies {
     implementation(project(":discovery:core:primitives"))
     implementation(project(":discovery:test"))
     implementation(libs.koin.core)
+    implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.serialization.json)
 }
 

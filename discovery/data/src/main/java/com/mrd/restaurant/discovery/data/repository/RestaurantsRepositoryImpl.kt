@@ -9,11 +9,16 @@ import com.mrd.restaurant.discovery.data.datasource.LocalRestaurantsDataSource
 import com.mrd.restaurant.discovery.data.datasource.RemoteRestaurantsDataSource
 import com.mrd.restaurant.discovery.data.mapper.RestaurantsMapper.toDomain
 import com.mrd.restaurant.discovery.data.mapper.RestaurantsMapper.toEntity
+import kotlinx.coroutines.flow.Flow
 
 class RestaurantsRepositoryImpl(
     private val localDataSource: LocalRestaurantsDataSource,
     private val remoteDataSource: RemoteRestaurantsDataSource
 ) : RestaurantsRepository {
+
+    override fun observeFavouriteIds(): Flow<Set<String>> {
+        return localDataSource.observeFavouriteIds()
+    }
 
     override suspend fun filterRestaurants(
         filters: RestaurantFilters,

@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.mrd.android.build.environments)
     alias(libs.plugins.mrd.android.compose)
+    alias(libs.plugins.mrd.kotlin.unit.tests)
 }
 
 android {
@@ -29,6 +30,7 @@ dependencies {
     implementation(project(":discovery:core:primitives"))
     implementation(project(":discovery:domain"))
     implementation(project(":discovery:ui"))
+    testImplementation(project(":discovery:test"))
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
     implementation(libs.material)

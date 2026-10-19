@@ -116,9 +116,9 @@ private fun RestaurantDetailsContent(
                             )
 
                             FavouriteIconButton(
-                                favourite = restaurant.favourite,
+                                favourite = state.favourite,
                                 onClick = {
-                                    onIntent(RestaurantDetailsIntent.Favourite)
+                                    onIntent(RestaurantDetailsIntent.ToggleFavourite)
                                 }
                             )
                         }

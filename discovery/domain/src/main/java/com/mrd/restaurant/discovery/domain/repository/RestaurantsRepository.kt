@@ -3,8 +3,11 @@ package com.mrd.restaurant.discovery.domain.repository
 import com.mrd.restaurant.discovery.domain.model.Restaurant
 import com.mrd.restaurant.discovery.core.primitive.model.Pagination
 import com.mrd.restaurant.discovery.core.primitive.model.PagedResult
+import kotlinx.coroutines.flow.Flow
 
 interface RestaurantsRepository {
+
+    fun observeFavouriteIds(): Flow<Set<String>>
 
     suspend fun filterRestaurants(
         filters: RestaurantFilters,
