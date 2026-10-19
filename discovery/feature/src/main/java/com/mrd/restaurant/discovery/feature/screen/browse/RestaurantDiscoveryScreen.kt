@@ -272,6 +272,7 @@ private fun RestaurantDiscoveryContent(
     state: RestaurantDiscoveryUiState.Success,
     onIntent: (RestaurantDiscoveryIntent) -> Unit,
 ) {
+    val isTransitionRunning = visibilityScope.transition.isRunning
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -291,15 +292,21 @@ private fun RestaurantDiscoveryContent(
                     restaurant = restaurant
                 )
 
-                FavouriteIconButton(
+                AnimatedVisibility(
+                    visible = !isTransitionRunning,
+                    enter = fadeIn(animationSpec = tween(500)),
+                    exit = fadeOut(animationSpec = tween(300)),
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-                        .padding(top = Dimens.SpacingSmall),
-                    favourite = favourites.contains(restaurant.id),
-                    onClick = {
-                        onIntent(RestaurantDiscoveryIntent.ToggleFavourite(restaurant))
-                    }
-                )
+                        .padding(top = Dimens.SpacingSmall, end = Dimens.SpacingSmall)
+                ) {
+                    FavouriteIconButton(
+                        favourite = favourites.contains(restaurant.id) || restaurant.favourite,
+                        onClick = {
+                            onIntent(RestaurantDiscoveryIntent.ToggleFavourite(restaurant))
+                        }
+                    )
+                }
             }
             if (index != restaurants.lastIndex) {
                 Spacer(modifier = Modifier.height(Dimens.SpacingSmall))
