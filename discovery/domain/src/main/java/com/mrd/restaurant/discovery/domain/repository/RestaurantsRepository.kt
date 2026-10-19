@@ -15,7 +15,7 @@ interface RestaurantsRepository {
         id: String
     ): Restaurant?
 
-    suspend fun setWishlisted(restaurantId: String, wishlisted: Boolean)
+    suspend fun setFavourite(restaurantId: String, favourite: Boolean)
 }
 
 data class RestaurantFilters(

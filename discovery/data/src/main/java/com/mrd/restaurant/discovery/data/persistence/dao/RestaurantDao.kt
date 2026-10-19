@@ -37,9 +37,7 @@ interface RestaurantDao {
     @Query("SELECT * FROM Restaurant WHERE id IN (:ids)")
     suspend fun getRestaurantsByIds(ids: List<String>): List<RestaurantEntity>
 
-    @Query("UPDATE Restaurant SET wishlisted = :wishlisted WHERE id = :id")
-    suspend fun updateWishlisted(id: String, wishlisted: Boolean)
+    @Query("UPDATE Restaurant SET favourite = :favourite WHERE id = :id")
+    suspend fun updateFavourite(id: String, favourite: Boolean)
 
-    @Query("UPDATE Restaurant SET wishlisted = :wishlisted WHERE id = :id")
-    suspend fun updateWishlist(id: String, wishlisted: Boolean)
 }

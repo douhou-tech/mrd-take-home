@@ -6,6 +6,7 @@ import com.mrd.restaurant.discovery.data.datasource.LocalRestaurantsDataSource
 import com.mrd.restaurant.discovery.data.datasource.RemoteRestaurantsDataSource
 import com.mrd.test.randomString
 import io.mockk.coVerify
+import io.mockk.coVerifyOrder
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
@@ -48,15 +49,15 @@ class RestaurantsRepositoryImplTest {
     }
 
     @Test
-    fun `when setWishlisted then call both local and remote data sources`() = runTest {
+    fun `when setFavourite then call both local and remote data sources in correct order`() = runTest {
         val id = randomString(10)
-        val wishlisted = true
+        val favourite = true
 
-        subject.setWishlisted(id, wishlisted)
+        subject.setFavourite(id, favourite)
 
-        coVerify {
-            localDataSource.setWishlisted(eq(id), eq(wishlisted))
-            remoteDataSource.setWishlisted(eq(id), eq(wishlisted))
+        coVerifyOrder {
+            remoteDataSource.setFavourite(eq(id), eq(favourite))
+            localDataSource.setFavourite(eq(id), eq(favourite))
         }
     }
 

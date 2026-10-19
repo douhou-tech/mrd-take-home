@@ -14,5 +14,5 @@ data class RestaurantRemoteModel(
     @SerialName("eta_minutes") val etaMinutes: Int = 0,
     @SerialName("is_open") val isOpen: Boolean = false,
     @SerialName("image_url") val imageUrl: String = "",
-    @SerialName("wishlisted") val wishlisted: Boolean = false
+    @SerialName("favourite") val favourite: Boolean = false,
 )

@@ -152,14 +152,14 @@ class LocalRestaurantsDataSourceImplTest {
     }
 
     @Test
-    fun `when setWishlisted then update dao wishlisted field`() = runTest {
+    fun `when setFavourite then update dao favourite field`() = runTest {
         val restaurantId = randomString(5)
-        val wishlisted = true
+        val favourite = true
 
-        subject.setWishlisted(restaurantId, wishlisted)
+        subject.setFavourite(restaurantId, favourite)
 
         coVerify {
-            restaurantDao.updateWishlisted(eq(restaurantId), eq(wishlisted))
+            restaurantDao.updateFavourite(eq(restaurantId), eq(favourite))
         }
     }
 }

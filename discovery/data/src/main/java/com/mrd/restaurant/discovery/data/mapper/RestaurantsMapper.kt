@@ -17,7 +17,7 @@ internal object RestaurantsMapper {
             etaMinutes = etaMinutes,
             isOpen = isOpen,
             imageUrl = imageUrl,
-            wishlisted = wishlisted
+            favourite = favourite
         )
     }
 
@@ -32,7 +32,7 @@ internal object RestaurantsMapper {
             etaMinutes = etaMinutes,
             isOpen = isOpen,
             imageUrl = imageUrl,
-            wishlisted = wishlisted
+            favourite = favourite
         )
     }
 
@@ -47,7 +47,7 @@ internal object RestaurantsMapper {
             etaMinutes = etaMinutes,
             isOpen = isOpen,
             imageUrl = imageUrl,
-            wishlisted = wishlisted
+            favourite = favourite
         )
     }
 }

@@ -7,12 +7,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 @Composable
-fun WishlistIconButton(
+fun FavouriteIconButton(
     modifier: Modifier = Modifier,
-    wishlisted: Boolean,
+    favourite: Boolean,
     onClick: () -> Unit
 ) {
-    val icon = when (wishlisted) {
+    val icon = when (favourite) {
         true -> Icons.Default.Favorite
         else -> Icons.Default.FavoriteBorder
     }

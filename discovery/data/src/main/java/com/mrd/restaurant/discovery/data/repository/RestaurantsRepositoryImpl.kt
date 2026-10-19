@@ -42,9 +42,9 @@ class RestaurantsRepositoryImpl(
         }
     }
 
-    override suspend fun setWishlisted(restaurantId: String, wishlisted: Boolean) {
-        remoteDataSource.setWishlisted(restaurantId, wishlisted)
-        localDataSource.setWishlisted(restaurantId, wishlisted)
+    override suspend fun setFavourite(restaurantId: String, favourite: Boolean) {
+        remoteDataSource.setFavourite(restaurantId, favourite)
+        localDataSource.setFavourite(restaurantId, favourite)
     }
 
 }

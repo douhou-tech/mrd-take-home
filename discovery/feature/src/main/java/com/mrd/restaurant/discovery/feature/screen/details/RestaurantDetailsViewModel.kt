@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mrd.restaurant.discovery.core.primitive.model.EitherResult
 import com.mrd.restaurant.discovery.domain.model.Restaurant
+import com.mrd.restaurant.discovery.domain.usecase.FavouriteRestaurantUseCase
 import com.mrd.restaurant.discovery.domain.usecase.FetchRestaurantByIdUseCase
-import com.mrd.restaurant.discovery.domain.usecase.WishlistRestaurantUseCase
 import com.mrd.restaurant.discovery.feature.navigation.FeatureNavigator
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,35 +21,33 @@ import kotlin.time.Duration.Companion.milliseconds
 class RestaurantDetailsViewModel(
     private val navigator: FeatureNavigator,
     private val fetchRestaurantByIdUseCase: FetchRestaurantByIdUseCase,
-    private val wishlistRestaurantUseCase: WishlistRestaurantUseCase,
+    private val favouriteRestaurantUseCase: FavouriteRestaurantUseCase,
     private val restaurantId: String,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<RestaurantDetailsUiState>(RestaurantDetailsUiState.Loading)
     val uiState: StateFlow<RestaurantDetailsUiState> = _uiState
 
-    private val wishlistFlow = MutableStateFlow<Boolean?>(null)
+    private val favouriteFlow = MutableStateFlow<Boolean?>(null)
 
     init {
         loadRestaurant()
-        setupWishlistFlow()
+        setupFavouriteFlow()
     }
 
-    private fun setupWishlistFlow() {
+    private fun setupFavouriteFlow() {
         viewModelScope.launch {
-            wishlistFlow
+            favouriteFlow
                 .filterNotNull()
                 .debounce(300L.milliseconds)
-                .collectLatest { wishlisted ->
-                    wishlist(wishlisted)
-                }
+                .collectLatest(::favourite)
         }
     }
 
     fun onIntent(intent: RestaurantDetailsIntent) {
         when (intent) {
             RestaurantDetailsIntent.Back -> onBack()
-            RestaurantDetailsIntent.Wishlist -> onWishlist()
+            RestaurantDetailsIntent.Favourite -> onFavourite()
         }
     }
 
@@ -57,29 +55,29 @@ class RestaurantDetailsViewModel(
         navigator.navigateBack()
     }
 
-    private fun onWishlist() {
+    private fun onFavourite() {
         val currentState = _uiState.value
         if (currentState !is RestaurantDetailsUiState.Success) return
 
         val currentRestaurant = currentState.restaurant
-        val newWishlisted = !currentRestaurant.wishlisted
+        val newFavourite = !currentRestaurant.favourite
 
         _uiState.update { state ->
             if (state is RestaurantDetailsUiState.Success) {
-                state.copy(restaurant = state.restaurant.copy(wishlisted = newWishlisted))
+                state.copy(restaurant = state.restaurant.copy(favourite = newFavourite, wishlisted = newFavourite))
             } else state
         }
 
-        wishlistFlow.value = newWishlisted
+        favouriteFlow.value = newFavourite
     }
 
-    private suspend fun wishlist(wishlisted: Boolean) {
-        when (wishlistRestaurantUseCase(restaurantId, wishlisted)) {
+    private suspend fun favourite(favourite: Boolean) {
+        when (favouriteRestaurantUseCase(restaurantId, favourite)) {
             is EitherResult.Success -> Unit
             is EitherResult.Error -> {
                 _uiState.update { state ->
                     if (state is RestaurantDetailsUiState.Success) {
-                        state.copy(restaurant = state.restaurant.copy(wishlisted = !wishlisted))
+                        state.copy(restaurant = state.restaurant.copy(favourite = !favourite, wishlisted = !favourite))
                     } else state
                 }
             }
@@ -110,7 +108,7 @@ class RestaurantDetailsViewModel(
 
 sealed interface RestaurantDetailsIntent {
     data object Back : RestaurantDetailsIntent
-    data object Wishlist : RestaurantDetailsIntent
+    data object Favourite : RestaurantDetailsIntent
 }
 
 sealed interface RestaurantDetailsUiState {

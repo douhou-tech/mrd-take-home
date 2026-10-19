@@ -17,7 +17,7 @@ interface RemoteRestaurantsDataSource {
 
     fun getRestaurant(id: String): RestaurantRemoteModel?
 
-    suspend fun setWishlisted(restaurantId: String, wishlisted: Boolean)
+    suspend fun setFavourite(restaurantId: String, favourite: Boolean)
 }
 
 internal class MockRemoteRestaurantsDataSource(
@@ -28,7 +28,7 @@ internal class MockRemoteRestaurantsDataSource(
         Json.decodeFromString(restaurantsJson)
     }
 
-    private val wishlistedMap = mutableMapOf<String, Boolean>()
+    private val favouriteMap = mutableMapOf<String, Boolean>()
 
     override suspend fun getRestaurants(
         filters: RestaurantFilters,
@@ -75,7 +75,7 @@ internal class MockRemoteRestaurantsDataSource(
         return allRestaurants.firstOrNull { it.id == id }
     }
 
-    override suspend fun setWishlisted(restaurantId: String, wishlisted: Boolean) {
-        wishlistedMap[restaurantId] = wishlisted
+    override suspend fun setFavourite(restaurantId: String, favourite: Boolean) {
+        favouriteMap[restaurantId] = favourite
     }
 }

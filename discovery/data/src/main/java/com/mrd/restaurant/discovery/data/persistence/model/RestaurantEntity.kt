@@ -15,7 +15,7 @@ data class RestaurantEntity(
     val etaMinutes: Int = 0,
     val isOpen: Boolean = false,
     val imageUrl: String = "",
-    val wishlisted: Boolean = false
+    val favourite: Boolean = false
 )
 
 data class RestaurantEntityPagedResult(

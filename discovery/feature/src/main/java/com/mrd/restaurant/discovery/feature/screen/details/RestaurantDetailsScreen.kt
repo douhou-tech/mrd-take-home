@@ -44,9 +44,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mrd.restaurant.discovery.ui.Dimens
+import com.mrd.restaurant.discovery.ui.component.FavouriteIconButton
 import com.mrd.restaurant.discovery.ui.component.MrDIconButton
 import com.mrd.restaurant.discovery.ui.component.RemoteImage
-import com.mrd.restaurant.discovery.ui.component.WishlistIconButton
 import com.mrd.restaurant.discovery.ui.container.MrDScreenScaffold
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
@@ -115,10 +115,10 @@ private fun RestaurantDetailsContent(
                                 }
                             )
 
-                            WishlistIconButton(
-                                wishlisted = restaurant.wishlisted,
+                            FavouriteIconButton(
+                                favourite = restaurant.favourite,
                                 onClick = {
-                                    onIntent(RestaurantDetailsIntent.Wishlist)
+                                    onIntent(RestaurantDetailsIntent.Favourite)
                                 }
                             )
                         }

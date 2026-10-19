@@ -14,7 +14,7 @@ interface LocalRestaurantsDataSource {
     suspend fun getRestaurants(filters: RestaurantFilters, pagination: Pagination): PagedResult<RestaurantEntity>
     suspend fun upsertRestaurants(restaurants: List<RestaurantEntity>)
     suspend fun getRestaurant(id: String): RestaurantEntity
-    suspend fun setWishlisted(restaurantId: String, wishlisted: Boolean)
+    suspend fun setFavourite(restaurantId: String, favourite: Boolean)
 }
 
 class LocalRestaurantsDataSourceImpl(
@@ -57,8 +57,8 @@ class LocalRestaurantsDataSourceImpl(
             val ids = restaurants.map { it.id }
             val existing = restaurantDao.getRestaurantsByIds(ids).associateBy { it.id }
             val merged = restaurants.map { entity ->
-                val existingWishlisted = existing[entity.id]?.wishlisted ?: false
-                entity.copy(wishlisted = entity.wishlisted || existingWishlisted)
+                val existingFavourite = existing[entity.id]?.favourite ?: existing[entity.id]?.wishlisted ?: false
+                entity.copy(favourite = entity.favourite || existingFavourite, wishlisted = entity.wishlisted || existingFavourite)
             }
             restaurantDao.upsertRestaurants(merged)
         }
@@ -70,9 +70,9 @@ class LocalRestaurantsDataSourceImpl(
         }
     }
 
-    override suspend fun setWishlisted(restaurantId: String, wishlisted: Boolean) {
+    override suspend fun setFavourite(restaurantId: String, favourite: Boolean) {
         withContext(Dispatchers.IO) {
-            restaurantDao.updateWishlisted(restaurantId, wishlisted)
+            restaurantDao.updateFavourite(restaurantId, favourite)
         }
     }
 

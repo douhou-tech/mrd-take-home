@@ -12,12 +12,11 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import kotlin.random.Random
 
-class WishlistRestaurantUseCaseTest {
-
+class FavouriteRestaurantUseCaseTest {
 
     private val repository = mockk<RestaurantsRepository>(relaxed = true)
     private val logger = mockk<Logger>(relaxed = true)
-    private val subject = WishlistRestaurantUseCase(
+    private val subject = FavouriteRestaurantUseCase(
         repository = repository,
         logger = logger
     )
@@ -25,22 +24,21 @@ class WishlistRestaurantUseCaseTest {
     @Test
     fun `when invoke then repository is called with correct arguments`() = runTest {
         val restaurantId = randomString(10)
-        val wishlisted = Random.nextBoolean()
+        val favourite = Random.nextBoolean()
 
-        subject.invoke(restaurantId, wishlisted)
+        subject.invoke(restaurantId, favourite)
 
         coVerify {
-            repository.setWishlisted(eq(restaurantId), eq(wishlisted))
+            repository.setFavourite(eq(restaurantId), eq(favourite))
         }
     }
 
-
     @Test
-    fun `when invoke and wishlisted is successful then success result should be returned`() = runTest {
+    fun `when invoke and favourite is successful then success result should be returned`() = runTest {
         val restaurantId = randomString(10)
-        val wishlisted = Random.nextBoolean()
+        val favourite = Random.nextBoolean()
 
-        val actual = subject.invoke(restaurantId, wishlisted)
+        val actual = subject.invoke(restaurantId, favourite)
 
         actual shouldBeEqual EitherResult.Success(Unit)
     }
@@ -48,14 +46,13 @@ class WishlistRestaurantUseCaseTest {
     @Test
     fun `when invoke and repository throws an error then unknown error result should be returned`() = runTest {
         val restaurantId = randomString(10)
-        val wishlisted = Random.nextBoolean()
+        val favourite = Random.nextBoolean()
         coEvery {
-            repository.setWishlisted(any(), any())
+            repository.setFavourite(any(), any())
         } throws Exception("Test exception")
 
+        val actual = subject.invoke(restaurantId, favourite)
 
-        val actual = subject.invoke(restaurantId, wishlisted)
-
-        actual shouldBeEqual EitherResult.Error(WishlistRestaurantUseCase.Error.Unknown)
+        actual shouldBeEqual EitherResult.Error(FavouriteRestaurantUseCase.Error.Unknown)
     }
 }
