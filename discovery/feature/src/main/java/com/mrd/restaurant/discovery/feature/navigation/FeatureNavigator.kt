@@ -1,8 +1,8 @@
 package com.mrd.restaurant.discovery.feature.navigation
 
 import androidx.navigation3.runtime.NavKey
-import com.mrd.restaurant.discovery.core.navigation.BackNavigator
 import com.mrd.restaurant.discovery.domain.model.Restaurant
+import com.mrd.restaurant.discovery.ui.navigation.BackNavigator
 import kotlinx.serialization.Serializable
 
 @Serializable

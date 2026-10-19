@@ -32,7 +32,10 @@ class MainActivity : ComponentActivity(), AndroidScopeComponent {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val navigator: AppNavigator = get()
+            val navigator: AppNavigator = get<AppNavigator>().apply {
+                handleDeepLink(intent)
+            }
+
             TakeHomeDemoTheme {
                 SharedTransitionLayout {
                     CompositionLocalProvider(

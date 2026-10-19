@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.mrd.android.build.environments)
     alias(libs.plugins.mrd.android.compose)
     alias(libs.plugins.mrd.kotlin.unit.tests)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {

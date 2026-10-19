@@ -2,6 +2,9 @@ package com.mrd.restaurant.discovery.feature.di
 
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.runtime.compositionLocalOf
+import androidx.navigation3.runtime.deeplink.DeepLinkMatcher
+import androidx.navigation3.runtime.deeplink.UriDeepLinkMatcher
+import androidx.navigation3.runtime.deeplink.withBackStack
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.mrd.restaurant.discovery.feature.favourite.FavouriteRestaurantDelegate
 import com.mrd.restaurant.discovery.feature.favourite.FavouriteRestaurantDelegateImpl
@@ -10,12 +13,16 @@ import com.mrd.restaurant.discovery.feature.screen.browse.RestaurantDiscoveryScr
 import com.mrd.restaurant.discovery.feature.screen.browse.RestaurantDiscoveryViewModel
 import com.mrd.restaurant.discovery.feature.screen.details.RestaurantDetailsScreen
 import com.mrd.restaurant.discovery.feature.screen.details.RestaurantDetailsViewModel
+import kotlinx.serialization.serializer
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.core.parameter.parametersOf
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import org.koin.dsl.navigation3.navigation
+import androidx.core.net.toUri
+import androidx.navigation3.runtime.NavKey
 
 val LocalSharedTransitionScope = compositionLocalOf<SharedTransitionScope> {
     error("SharedTransitionScope not found")
@@ -67,4 +74,23 @@ val restaurantDiscoveryFeatureModule = module {
             visibilityScope = visibilityScope
         )
     }
+
+    single<DeepLinkMatcher<NavKey, *>>(named(FeatureModuleQualifiers.RESTAURANT_DETAILS_DEEPLINK_MATCHER)) {
+        UriDeepLinkMatcher(
+            uriPattern = "https://staging.takehome.mrd.com/restaurant/details/{restaurantId}".toUri(),
+            serializer = serializer<FeatureNavKey.RestaurantDetails.ById>()
+        ).withBackStack { matchResult ->
+            val route = matchResult.key
+            listOf(
+                FeatureNavKey.RestaurantDiscovery,
+                route
+            )
+        }
+    }
+}
+
+object FeatureModuleQualifiers {
+
+    const val RESTAURANT_DETAILS_DEEPLINK_MATCHER = "restaurant_details_deeplink_matcher"
+
 }
