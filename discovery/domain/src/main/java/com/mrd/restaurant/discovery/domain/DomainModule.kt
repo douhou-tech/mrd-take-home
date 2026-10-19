@@ -1,6 +1,6 @@
 package com.mrd.restaurant.discovery.domain
 
-import com.mrd.restaurant.discovery.domain.usecase.FavouriteRestaurantUseCase
+import com.mrd.restaurant.discovery.domain.usecase.ToggleFavouriteRestaurantUseCase
 import com.mrd.restaurant.discovery.domain.usecase.FetchRestaurantByIdUseCase
 import com.mrd.restaurant.discovery.domain.usecase.FilterRestaurantsUseCase
 import org.koin.dsl.module
@@ -19,7 +19,7 @@ val restaurantDiscoveryDomainModule = module {
         )
     }
     factory {
-        FavouriteRestaurantUseCase(
+        ToggleFavouriteRestaurantUseCase(
             repository = get(),
             logger = get()
         )

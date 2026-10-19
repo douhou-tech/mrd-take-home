@@ -12,11 +12,11 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import kotlin.random.Random
 
-class FavouriteRestaurantUseCaseTest {
+class ToggleFavouriteRestaurantUseCaseTest {
 
     private val repository = mockk<RestaurantsRepository>(relaxed = true)
     private val logger = mockk<Logger>(relaxed = true)
-    private val subject = FavouriteRestaurantUseCase(
+    private val subject = ToggleFavouriteRestaurantUseCase(
         repository = repository,
         logger = logger
     )
@@ -53,6 +53,6 @@ class FavouriteRestaurantUseCaseTest {
 
         val actual = subject.invoke(restaurantId, favourite)
 
-        actual shouldBeEqual EitherResult.Error(FavouriteRestaurantUseCase.Error.Unknown)
+        actual shouldBeEqual EitherResult.Error(ToggleFavouriteRestaurantUseCase.Error.Unknown)
     }
 }

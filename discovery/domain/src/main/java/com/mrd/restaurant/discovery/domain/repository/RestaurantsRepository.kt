@@ -18,6 +18,10 @@ interface RestaurantsRepository {
         id: String
     ): Restaurant?
 
+    suspend fun getLocalRestaurant(
+        id: String
+    ): Restaurant?
+
     suspend fun setFavourite(restaurantId: String, favourite: Boolean)
 }
 

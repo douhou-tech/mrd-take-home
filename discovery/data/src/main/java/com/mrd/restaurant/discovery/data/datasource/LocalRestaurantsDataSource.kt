@@ -16,7 +16,7 @@ interface LocalRestaurantsDataSource {
     fun observeFavouriteIds(): Flow<Set<String>>
     suspend fun getRestaurants(filters: RestaurantFilters, pagination: Pagination): PagedResult<RestaurantEntity>
     suspend fun upsertRestaurants(restaurants: List<RestaurantEntity>)
-    suspend fun getRestaurant(id: String): RestaurantEntity
+    suspend fun getRestaurant(id: String): RestaurantEntity?
     suspend fun setFavourite(restaurantId: String, favourite: Boolean)
 }
 

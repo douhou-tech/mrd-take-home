@@ -13,7 +13,9 @@ import com.mrd.restaurant.discovery.feature.favourite.FavouriteRestaurantDelegat
 import com.mrd.restaurant.discovery.feature.navigation.FeatureNavKey
 import com.mrd.restaurant.discovery.feature.navigation.FeatureNavigator
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -65,9 +67,11 @@ class RestaurantDiscoveryViewModel(
         .debounce(300L.milliseconds)
         .stateIn(
             viewModelScope,
-           kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(1000L),
+            SharingStarted.WhileSubscribed(1000L),
             filterState
         )
+
+    private var observeFavouritesJob: Job? = null
 
     init {
         setupInputChangeFlows()
@@ -86,7 +90,8 @@ class RestaurantDiscoveryViewModel(
     }
 
     private fun setupFavouritesChangeFlow() {
-        viewModelScope.launch {
+        observeFavouritesJob?.cancel()
+        observeFavouritesJob = viewModelScope.launch {
             favouriteRestaurantDelegate.favourites
                 .collect { favourites ->
                     _uiState.update { state ->
@@ -138,11 +143,8 @@ class RestaurantDiscoveryViewModel(
         val state = _uiState.value
         if (state !is RestaurantDiscoveryUiState.Success) return
 
-        val current = state.favourites.contains(restaurant.id) || restaurant.favourite
         favouriteRestaurantDelegate.toggleFavourite(
-            scope = viewModelScope,
             restaurantId = restaurant.id,
-            favourite = current
         )
     }
 
@@ -170,6 +172,7 @@ class RestaurantDiscoveryViewModel(
                     if (paged.items.isEmpty()) {
                         RestaurantDiscoveryUiState.Empty
                     } else {
+                        setupFavouritesChangeFlow()
                         RestaurantDiscoveryUiState.Success(
                             restaurants = paged.items
                         )

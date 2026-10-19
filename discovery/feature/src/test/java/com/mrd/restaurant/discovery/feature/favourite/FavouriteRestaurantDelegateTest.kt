@@ -2,7 +2,7 @@ package com.mrd.restaurant.discovery.feature.favourite
 
 import com.mrd.restaurant.discovery.core.primitive.model.EitherResult
 import com.mrd.restaurant.discovery.domain.repository.RestaurantsRepository
-import com.mrd.restaurant.discovery.domain.usecase.FavouriteRestaurantUseCase
+import com.mrd.restaurant.discovery.domain.usecase.ToggleFavouriteRestaurantUseCase
 import com.mrd.test.randomString
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -14,10 +14,10 @@ import org.junit.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class FavouriteRestaurantDelegateTest {
 
-    private val favouriteRestaurantUseCase = mockk<FavouriteRestaurantUseCase>(relaxed = true)
+    private val toggleFavouriteRestaurantUseCase = mockk<ToggleFavouriteRestaurantUseCase>(relaxed = true)
     private val restaurantsRepository = mockk<RestaurantsRepository>(relaxed = true)
     private val subject = FavouriteRestaurantDelegateImpl(
-        favouriteRestaurantUseCase = favouriteRestaurantUseCase,
+        toggleFavouriteRestaurantUseCase = toggleFavouriteRestaurantUseCase,
         restaurantsRepository = restaurantsRepository
     )
 
@@ -58,7 +58,7 @@ class FavouriteRestaurantDelegateTest {
     @Test
     fun `when use case fails then repository setFavourite is reverted to original state`() = runTest {
         val restaurantId = randomString(10)
-        coEvery { favouriteRestaurantUseCase(any(), any()) } returns EitherResult.Error(FavouriteRestaurantUseCase.Error.Unknown)
+        coEvery { favouriteRestaurantUseCase(any(), any()) } returns EitherResult.Error(ToggleFavouriteRestaurantUseCase.Error.Unknown)
 
         subject.toggleFavourite(
             scope = this,

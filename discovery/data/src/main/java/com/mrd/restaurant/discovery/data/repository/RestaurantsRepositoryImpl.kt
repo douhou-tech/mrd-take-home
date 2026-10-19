@@ -1,14 +1,14 @@
 package com.mrd.restaurant.discovery.data.repository
 
-import com.mrd.restaurant.discovery.domain.model.Restaurant
-import com.mrd.restaurant.discovery.domain.repository.RestaurantFilters
-import com.mrd.restaurant.discovery.domain.repository.RestaurantsRepository
 import com.mrd.restaurant.discovery.core.primitive.model.PagedResult
 import com.mrd.restaurant.discovery.core.primitive.model.Pagination
 import com.mrd.restaurant.discovery.data.datasource.LocalRestaurantsDataSource
 import com.mrd.restaurant.discovery.data.datasource.RemoteRestaurantsDataSource
 import com.mrd.restaurant.discovery.data.mapper.RestaurantsMapper.toDomain
 import com.mrd.restaurant.discovery.data.mapper.RestaurantsMapper.toEntity
+import com.mrd.restaurant.discovery.domain.model.Restaurant
+import com.mrd.restaurant.discovery.domain.repository.RestaurantFilters
+import com.mrd.restaurant.discovery.domain.repository.RestaurantsRepository
 import kotlinx.coroutines.flow.Flow
 
 class RestaurantsRepositoryImpl(
@@ -42,14 +42,23 @@ class RestaurantsRepositoryImpl(
         val remoteResult = remoteDataSource.getRestaurant(id)
         return remoteResult?.toEntity()?.let { entity ->
             localDataSource.upsertRestaurants(listOf(entity))
-            val localResult  = localDataSource.getRestaurant(id)
-            localResult.toDomain()
+            getLocalRestaurant(id)
         }
     }
 
+    override suspend fun getLocalRestaurant(id: String): Restaurant? {
+        val localResult = localDataSource.getRestaurant(id)
+        return localResult?.toDomain()
+    }
+
     override suspend fun setFavourite(restaurantId: String, favourite: Boolean) {
-        remoteDataSource.setFavourite(restaurantId, favourite)
-        localDataSource.setFavourite(restaurantId, favourite)
+        try {
+            localDataSource.setFavourite(restaurantId, favourite)
+            remoteDataSource.setFavourite(restaurantId, favourite)
+        } catch (ex: Exception) {
+            localDataSource.setFavourite(restaurantId, !favourite)
+            throw ex
+        }
     }
 
 }

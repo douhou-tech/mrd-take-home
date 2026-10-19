@@ -73,9 +73,7 @@ class RestaurantDetailsViewModel(
         if (state !is RestaurantDetailsUiState.Success) return
 
         favouriteRestaurantDelegate.toggleFavourite(
-            scope = viewModelScope,
-            restaurantId = restaurantId,
-            favourite = state.favourite
+            restaurantId = restaurantId
         )
     }
 

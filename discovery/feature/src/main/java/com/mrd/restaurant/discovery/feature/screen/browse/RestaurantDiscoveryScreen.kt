@@ -285,35 +285,16 @@ private fun RestaurantDiscoveryContent(
         state = listState
     ) {
         val restaurants = state.restaurants
-        val favourites = state.favourites
         items(restaurants.size, key = { restaurants[it].id }) { index ->
             val restaurant = state.restaurants[index]
-            Box(modifier = Modifier.fillMaxWidth()) {
-                RestaurantItem(
-                    modifier = Modifier.clickable {
-                        onIntent(RestaurantDiscoveryIntent.NavigateToDetails(restaurant))
-                    },
-                    sharedTransitionScope = sharedTransitionScope,
-                    visibilityScope = visibilityScope,
-                    restaurant = restaurant
-                )
-
-                AnimatedVisibility(
-                    visible = !isTransitionRunning,
-                    enter = fadeIn(animationSpec = tween(500)),
-                    exit = fadeOut(animationSpec = tween(300)),
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(top = Dimens.SpacingSmall, end = Dimens.SpacingSmall)
-                ) {
-                    FavouriteIconButton(
-                        favourite = favourites.contains(restaurant.id) || restaurant.favourite,
-                        onClick = {
-                            onIntent(RestaurantDiscoveryIntent.ToggleFavourite(restaurant))
-                        }
-                    )
-                }
-            }
+            RestaurantItem(
+                sharedTransitionScope = sharedTransitionScope,
+                visibilityScope = visibilityScope,
+                restaurant = restaurant,
+                isTransitionRunning = isTransitionRunning,
+                state = state,
+                onIntent = onIntent
+            )
             if (index != restaurants.lastIndex) {
                 Spacer(modifier = Modifier.height(Dimens.SpacingSmall))
             }
@@ -338,49 +319,77 @@ private fun RestaurantItem(
     modifier: Modifier = Modifier,
     sharedTransitionScope: SharedTransitionScope,
     visibilityScope: AnimatedContentScope,
-    restaurant: Restaurant
+    restaurant: Restaurant,
+    isTransitionRunning: Boolean,
+    state: RestaurantDiscoveryUiState.Success,
+    onIntent: (RestaurantDiscoveryIntent) -> Unit
 ) {
-    Column(
-        modifier = modifier
-            .padding(vertical = Dimens.SpacingSmall)
-    ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            with (sharedTransitionScope) {
-                RemoteImage(
-                    modifier = Modifier
-                        .sharedElement(
-                            sharedTransitionScope.rememberSharedContentState(key = restaurant.id),
-                            animatedVisibilityScope = visibilityScope
-                        )
-                        .clip(
-                            RoundedCornerShape(
-                                topStart = Dimens.SpacingSmall,
-                                topEnd = Dimens.SpacingSmall,
+    val favourite = state.favourites.contains(restaurant.id)
+    Box(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = modifier
+                .clickable {
+                    onIntent(RestaurantDiscoveryIntent.NavigateToDetails(restaurant))
+                }
+                .padding(vertical = Dimens.SpacingSmall)
+        ) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                with (sharedTransitionScope) {
+                    RemoteImage(
+                        modifier = Modifier
+                            .sharedElement(
+                                sharedTransitionScope.rememberSharedContentState(key = restaurant.id),
+                                animatedVisibilityScope = visibilityScope
                             )
-                        )
-                        .padding(bottom = Dimens.SpacingSmall),
-                    imageUrl = restaurant.imageUrl
-                )
-            }
-            if (!restaurant.isOpen) {
-                Box(
-                    modifier = Modifier
-                        .background(Color.Black.copy(alpha = 0.6f))
-                        .matchParentSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        style = MaterialTheme.typography.bodyLarge,
-                        text = "Closed"
+                            .clip(
+                                RoundedCornerShape(
+                                    topStart = Dimens.SpacingSmall,
+                                    topEnd = Dimens.SpacingSmall,
+                                )
+                            )
+                            .padding(bottom = Dimens.SpacingSmall),
+                        imageUrl = restaurant.imageUrl
                     )
                 }
+
+                if (!restaurant.isOpen) {
+                    Box(
+                        modifier = Modifier
+                            .background(Color.Black.copy(alpha = 0.6f))
+                            .matchParentSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            style = MaterialTheme.typography.bodyLarge,
+                            text = "Closed"
+                        )
+                    }
+
+                }
+
             }
+            Text(text = restaurant.displayName(), style = MaterialTheme.typography.titleMedium)
+            Text(text = restaurant.cuisines, style = MaterialTheme.typography.bodyMedium)
+            Text(
+                text = "Rating: ${restaurant.rating} ⭐ | ETA: ${restaurant.etaMinutes} mins",
+                style = MaterialTheme.typography.bodySmall
+            )
         }
-        Text(text = restaurant.displayName(), style = MaterialTheme.typography.titleMedium)
-        Text(text = restaurant.cuisines, style = MaterialTheme.typography.bodyMedium)
-        Text(
-            text = "Rating: ${restaurant.rating} ⭐ | ETA: ${restaurant.etaMinutes} mins",
-            style = MaterialTheme.typography.bodySmall
-        )
+
+        AnimatedVisibility(
+            visible = !isTransitionRunning,
+            enter = fadeIn(animationSpec = tween(500)),
+            exit = fadeOut(animationSpec = tween(300)),
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(top = Dimens.SpacingSmall, end = Dimens.SpacingSmall)
+        ) {
+            FavouriteIconButton(
+                favourite = favourite,
+                onClick = {
+                    onIntent(RestaurantDiscoveryIntent.ToggleFavourite(restaurant))
+                }
+            )
+        }
     }
 }

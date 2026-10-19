@@ -25,7 +25,7 @@ val LocalSharedTransitionScope = compositionLocalOf<SharedTransitionScope> {
 val restaurantDiscoveryFeatureModule = module {
     single<FavouriteRestaurantDelegate> {
         FavouriteRestaurantDelegateImpl(
-            favouriteRestaurantUseCase = get(),
+            toggleFavouriteRestaurantUseCase = get(),
             restaurantsRepository = get()
         )
     }
