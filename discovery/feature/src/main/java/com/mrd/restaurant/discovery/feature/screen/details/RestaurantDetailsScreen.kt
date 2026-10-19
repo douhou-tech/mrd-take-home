@@ -6,6 +6,8 @@ import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -96,7 +98,9 @@ private fun RestaurantDetailsContent(
 
         item {
             GradientShadowBox(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .zIndex(2f),
                 isRevealed = isRevealed,
                 overlayContent = {
                     AnimatedVisibility(
@@ -141,36 +145,49 @@ private fun RestaurantDetailsContent(
         }
 
         item {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(Dimens.SpacingMedium),
+            AnimatedVisibility(
+                visible = isRevealed,
+                modifier = Modifier.zIndex(1f),
+                enter = slideInVertically(
+                    initialOffsetY = { -it },
+                    animationSpec = tween(300)
+                ) + fadeIn(animationSpec = tween(500)),
+                exit = slideOutVertically(
+                    targetOffsetY = { -it },
+                    animationSpec = tween(300)
+                ) + fadeOut(animationSpec = tween(300))
             ) {
-                Text(
-                    text = restaurant.name,
-                    fontSize = MaterialTheme.typography.headlineSmall.fontSize,
-                )
-                Text(
-                    text = restaurant.location,
-                    fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-                )
-                Spacer(modifier = Modifier.height(Dimens.SpacingSmall))
-                DescriptionTextItem(
-                    icon = Icons.Default.Star,
-                    text = "${restaurant.rating}"
-                )
-                Spacer(modifier = Modifier.height(Dimens.SpacingSmall))
-                DescriptionTextItem(
-                    icon = Icons.Default.DateRange,
-                    text = "ETA: ${restaurant.etaMinutes} mins"
-                )
-                Spacer(modifier = Modifier.height(Dimens.SpacingSmall))
-                Text(
-                    fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center,
-                    text = restaurant.cuisines
-                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(Dimens.SpacingMedium),
+                ) {
+                    Text(
+                        text = restaurant.name,
+                        fontSize = MaterialTheme.typography.headlineSmall.fontSize,
+                    )
+                    Text(
+                        text = restaurant.location,
+                        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                    )
+                    Spacer(modifier = Modifier.height(Dimens.SpacingSmall))
+                    DescriptionTextItem(
+                        icon = Icons.Default.Star,
+                        text = "${restaurant.rating}"
+                    )
+                    Spacer(modifier = Modifier.height(Dimens.SpacingSmall))
+                    DescriptionTextItem(
+                        icon = Icons.Default.DateRange,
+                        text = "ETA: ${restaurant.etaMinutes} mins"
+                    )
+                    Spacer(modifier = Modifier.height(Dimens.SpacingSmall))
+                    Text(
+                        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center,
+                        text = restaurant.cuisines
+                    )
+                }
             }
         }
 
