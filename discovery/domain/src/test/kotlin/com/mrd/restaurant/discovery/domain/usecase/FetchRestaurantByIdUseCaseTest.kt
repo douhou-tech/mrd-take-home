@@ -1,5 +1,6 @@
 package com.mrd.restaurant.discovery.domain.usecase
 
+import com.mrd.restaurant.discovery.core.logging.Logger
 import com.mrd.restaurant.discovery.core.primitive.model.EitherResult
 import com.mrd.restaurant.discovery.domain.model.Restaurant
 import com.mrd.restaurant.discovery.domain.repository.RestaurantsRepository
@@ -14,8 +15,12 @@ import org.junit.Test
 
 class FetchRestaurantByIdUseCaseTest {
 
-    private val restaurantsRepository = mockk<RestaurantsRepository>(relaxed = true)
-    private val subject = FetchRestaurantByIdUseCase(restaurantsRepository)
+    private val repository = mockk<RestaurantsRepository>(relaxed = true)
+    private val logger = mockk<Logger>(relaxed = true)
+    private val subject = FetchRestaurantByIdUseCase(
+        repository = repository,
+        logger = logger
+    )
 
     @Test
     fun `when invoke then call repository should be called with correct parameters`() = runTest {
@@ -23,7 +28,7 @@ class FetchRestaurantByIdUseCaseTest {
 
         subject(expectedId)
 
-        coVerify { restaurantsRepository.getRestaurant(eq(expectedId)) }
+        coVerify { repository.getRestaurant(eq(expectedId)) }
     }
 
     @Test
@@ -32,7 +37,7 @@ class FetchRestaurantByIdUseCaseTest {
         val data = mockk<Restaurant>(relaxed = true).apply {
             every { id } returns expectedId
         }
-        coEvery { restaurantsRepository.getRestaurant(eq(expectedId)) } returns data
+        coEvery { repository.getRestaurant(eq(expectedId)) } returns data
 
         val actual = subject(expectedId)
 
@@ -41,7 +46,7 @@ class FetchRestaurantByIdUseCaseTest {
 
     @Test
     fun `when invoke and exception is thrown then unknown error result should be returned`() = runTest {
-        coEvery { restaurantsRepository.getRestaurant(any()) } throws Exception("Test exception")
+        coEvery { repository.getRestaurant(any()) } throws Exception("Test exception")
 
         val actual = subject(randomString(10))
 
