@@ -28,6 +28,7 @@ class RestaurantDetailsViewModel(
     fun onIntent(intent: RestaurantDetailsIntent) {
         when (intent) {
             RestaurantDetailsIntent.Back -> onBack()
+            RestaurantDetailsIntent.Favourite -> Unit
         }
     }
 
@@ -59,6 +60,7 @@ class RestaurantDetailsViewModel(
 
 sealed interface RestaurantDetailsIntent {
     data object Back : RestaurantDetailsIntent
+    data object Favourite : RestaurantDetailsIntent
 }
 
 sealed interface RestaurantDetailsUiState {

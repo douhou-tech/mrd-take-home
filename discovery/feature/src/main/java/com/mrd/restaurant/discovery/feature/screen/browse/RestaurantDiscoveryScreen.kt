@@ -50,8 +50,10 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.mrd.restaurant.discovery.domain.model.Restaurant
 import com.mrd.restaurant.discovery.feature.shared.component.KeyboardVisibleContentMask
 import com.mrd.restaurant.discovery.feature.shared.component.MrDScreenLoader
@@ -106,6 +108,7 @@ fun RestaurantDiscoveryScreen(
             modifier = Modifier
                 .padding(horizontal = Dimens.SpacingMedium)
                 .fillMaxSize()
+                .clipToBounds()
         ) {
             AnimatedVisibility(!shouldShowFilters) {
                 RestaurantFilterSection(
@@ -175,7 +178,8 @@ private fun RestaurantSearchContent(
 
     Box(
         modifier = Modifier
-            .fillMaxSize(),
+            .fillMaxSize()
+            .zIndex(1f),
         contentAlignment = Alignment.BottomCenter,
     ) {
         KeyboardVisibleContentMask()
