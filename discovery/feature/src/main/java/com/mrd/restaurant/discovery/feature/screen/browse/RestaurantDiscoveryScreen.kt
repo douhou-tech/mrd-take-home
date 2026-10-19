@@ -61,7 +61,9 @@ import com.mrd.restaurant.discovery.ui.component.KeyboardVisibleContentMask
 import com.mrd.restaurant.discovery.ui.component.MrDScreenLoader
 import com.mrd.restaurant.discovery.ui.component.RemoteImage
 import com.mrd.restaurant.discovery.ui.container.MrDScreenScaffold
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlin.time.Duration.Companion.milliseconds
 
 private const val LOAD_MORE_THRESHOLD = 5
 
@@ -278,7 +280,12 @@ private fun RestaurantDiscoveryContent(
     state: RestaurantDiscoveryUiState.Success,
     onIntent: (RestaurantDiscoveryIntent) -> Unit,
 ) {
-    val isTransitionRunning = visibilityScope.transition.isRunning
+    var initialLoad by remember { mutableStateOf(true) }
+    LaunchedEffect(Unit) {
+        delay(1000L.milliseconds)
+        initialLoad = false
+    }
+    val isTransitionRunning = visibilityScope.transition.isRunning || initialLoad
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),

@@ -93,7 +93,8 @@ class RestaurantDiscoveryViewModel(
         observeFavouritesJob?.cancel()
         observeFavouritesJob = viewModelScope.launch {
             favouriteRestaurantDelegate.favourites
-                .collect { favourites ->
+                .distinctUntilChanged()
+                .collectLatest { favourites ->
                     _uiState.update { state ->
                         if (state is RestaurantDiscoveryUiState.Success) {
                             state.copy(

@@ -9,7 +9,9 @@ import com.mrd.restaurant.discovery.data.mapper.RestaurantsMapper.toEntity
 import com.mrd.restaurant.discovery.domain.model.Restaurant
 import com.mrd.restaurant.discovery.domain.repository.RestaurantFilters
 import com.mrd.restaurant.discovery.domain.repository.RestaurantsRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlin.time.Duration.Companion.milliseconds
 
 class RestaurantsRepositoryImpl(
     private val localDataSource: LocalRestaurantsDataSource,
@@ -54,6 +56,7 @@ class RestaurantsRepositoryImpl(
     override suspend fun setFavourite(restaurantId: String, favourite: Boolean) {
         try {
             localDataSource.setFavourite(restaurantId, favourite)
+            delay(2000L.milliseconds)
             remoteDataSource.setFavourite(restaurantId, favourite)
         } catch (ex: Exception) {
             localDataSource.setFavourite(restaurantId, !favourite)
