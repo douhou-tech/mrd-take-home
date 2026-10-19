@@ -18,16 +18,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
-import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,10 +43,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.delay
-import com.mrd.restaurant.discovery.ui.component.RemoteImage
-import com.mrd.restaurant.discovery.ui.container.MrDScreenScaffold
 import com.mrd.restaurant.discovery.ui.Dimens
+import com.mrd.restaurant.discovery.ui.component.MrDIconButton
+import com.mrd.restaurant.discovery.ui.component.RemoteImage
+import com.mrd.restaurant.discovery.ui.component.WishlistIconButton
+import com.mrd.restaurant.discovery.ui.container.MrDScreenScaffold
+import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
@@ -110,16 +108,17 @@ private fun RestaurantDetailsContent(
                             modifier = Modifier.fillMaxSize().zIndex(1f),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            TopBarIcon(
+                            MrDIconButton(
                                 icon = Icons.AutoMirrored.Default.ArrowBack,
                                 onClick = {
                                     onIntent(RestaurantDetailsIntent.Back)
                                 }
                             )
-                            TopBarIcon(
-                                icon = Icons.Default.FavoriteBorder,
+
+                            WishlistIconButton(
+                                wishlisted = restaurant.wishlisted,
                                 onClick = {
-                                    onIntent(RestaurantDetailsIntent.Favourite)
+                                    onIntent(RestaurantDetailsIntent.Wishlist)
                                 }
                             )
                         }
@@ -187,29 +186,6 @@ private fun RestaurantDetailsContent(
             }
         }
     }
-}
-
-@Composable
-private fun TopBarIcon(
-    icon: ImageVector,
-    onClick: () -> Unit
-) {
-    FilledIconButton(
-        onClick = onClick,
-        colors = IconButtonColors(
-            containerColor = Color.Black.copy(alpha = 0.7f),
-            contentColor = MaterialTheme.colorScheme.onSurface,
-            disabledContainerColor = MaterialTheme.colorScheme.surface,
-            disabledContentColor = MaterialTheme.colorScheme.onSurface
-        ),
-        shape = RoundedCornerShape(32.dp),
-        content = {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-            )
-        }
-    )
 }
 
 @Composable

@@ -2,8 +2,8 @@ package com.mrd.restaurant.discovery.domain
 
 import com.mrd.restaurant.discovery.domain.usecase.FetchRestaurantByIdUseCase
 import com.mrd.restaurant.discovery.domain.usecase.FilterRestaurantsUseCase
+import com.mrd.restaurant.discovery.domain.usecase.WishlistRestaurantUseCase
 import org.koin.dsl.module
-import kotlin.math.log
 
 val restaurantDiscoveryDomainModule = module {
     factory {
@@ -14,6 +14,12 @@ val restaurantDiscoveryDomainModule = module {
     }
     factory {
         FetchRestaurantByIdUseCase(
+            repository = get(),
+            logger = get()
+        )
+    }
+    factory {
+        WishlistRestaurantUseCase(
             repository = get(),
             logger = get()
         )
