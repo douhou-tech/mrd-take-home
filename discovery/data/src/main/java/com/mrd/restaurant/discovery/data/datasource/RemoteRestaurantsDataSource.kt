@@ -1,11 +1,10 @@
 package com.mrd.restaurant.discovery.data.datasource
 
-import com.mrd.restaurant.discovery.domain.repository.RestaurantFilter
-import com.mrd.restaurant.discovery.domain.repository.RestaurantFilters
 import com.mrd.restaurant.discovery.core.primitive.model.PagedResult
 import com.mrd.restaurant.discovery.core.primitive.model.Pagination
 import com.mrd.restaurant.discovery.data.remote.model.RestaurantRemoteModel
-import com.mrd.restaurant.discovery.domain.usecase.FetchRestaurantByIdUseCase
+import com.mrd.restaurant.discovery.domain.repository.RestaurantFilter
+import com.mrd.restaurant.discovery.domain.repository.RestaurantFilters
 import kotlinx.serialization.json.Json
 import kotlin.math.max
 import kotlin.math.min
@@ -17,6 +16,8 @@ interface RemoteRestaurantsDataSource {
     ): PagedResult<RestaurantRemoteModel>
 
     fun getRestaurant(id: String): RestaurantRemoteModel?
+
+    suspend fun setWishlisted(restaurantId: String, wishlisted: Boolean)
 }
 
 internal class MockRemoteRestaurantsDataSource(
@@ -26,6 +27,8 @@ internal class MockRemoteRestaurantsDataSource(
     private val allRestaurants: List<RestaurantRemoteModel> by lazy {
         Json.decodeFromString(restaurantsJson)
     }
+
+    private val wishlistedMap = mutableMapOf<String, Boolean>()
 
     override suspend fun getRestaurants(
         filters: RestaurantFilters,
@@ -70,5 +73,9 @@ internal class MockRemoteRestaurantsDataSource(
 
     override fun getRestaurant(id: String): RestaurantRemoteModel? {
         return allRestaurants.firstOrNull { it.id == id }
+    }
+
+    override suspend fun setWishlisted(restaurantId: String, wishlisted: Boolean) {
+        wishlistedMap[restaurantId] = wishlisted
     }
 }

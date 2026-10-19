@@ -16,7 +16,8 @@ internal object RestaurantsMapper {
             deliveryFeeInCents = deliveryFeeInCents,
             etaMinutes = etaMinutes,
             isOpen = isOpen,
-            imageUrl = imageUrl
+            imageUrl = imageUrl,
+            wishlisted = wishlisted
         )
     }
 
@@ -30,7 +31,8 @@ internal object RestaurantsMapper {
             deliveryFeeInCents = deliveryFeeInCents,
             etaMinutes = etaMinutes,
             isOpen = isOpen,
-            imageUrl = imageUrl
+            imageUrl = imageUrl,
+            wishlisted = wishlisted
         )
     }
 
@@ -44,7 +46,8 @@ internal object RestaurantsMapper {
             deliveryFeeInCents = deliveryFeeInCents,
             etaMinutes = etaMinutes,
             isOpen = isOpen,
-            imageUrl = imageUrl
+            imageUrl = imageUrl,
+            wishlisted = wishlisted
         )
     }
 }

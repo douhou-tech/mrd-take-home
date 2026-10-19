@@ -150,4 +150,16 @@ class LocalRestaurantsDataSourceImplTest {
 
         actual shouldBeEqual expected
     }
+
+    @Test
+    fun `when setWishlisted then update dao wishlisted field`() = runTest {
+        val restaurantId = randomString(5)
+        val wishlisted = true
+
+        subject.setWishlisted(restaurantId, wishlisted)
+
+        coVerify {
+            restaurantDao.updateWishlisted(eq(restaurantId), eq(wishlisted))
+        }
+    }
 }

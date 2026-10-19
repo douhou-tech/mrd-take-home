@@ -1,11 +1,11 @@
 package com.mrd.restaurant.discovery.data.datasource
 
-import com.mrd.restaurant.discovery.domain.repository.RestaurantFilter
-import com.mrd.restaurant.discovery.domain.repository.RestaurantFilters
 import com.mrd.restaurant.discovery.core.primitive.model.PagedResult
 import com.mrd.restaurant.discovery.core.primitive.model.Pagination
 import com.mrd.restaurant.discovery.data.persistence.dao.RestaurantDao
 import com.mrd.restaurant.discovery.data.persistence.model.RestaurantEntity
+import com.mrd.restaurant.discovery.domain.repository.RestaurantFilter
+import com.mrd.restaurant.discovery.domain.repository.RestaurantFilters
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.math.max
@@ -14,6 +14,7 @@ interface LocalRestaurantsDataSource {
     suspend fun getRestaurants(filters: RestaurantFilters, pagination: Pagination): PagedResult<RestaurantEntity>
     suspend fun upsertRestaurants(restaurants: List<RestaurantEntity>)
     suspend fun getRestaurant(id: String): RestaurantEntity
+    suspend fun setWishlisted(restaurantId: String, wishlisted: Boolean)
 }
 
 class LocalRestaurantsDataSourceImpl(
@@ -53,13 +54,25 @@ class LocalRestaurantsDataSourceImpl(
 
     override suspend fun upsertRestaurants(restaurants: List<RestaurantEntity>) {
         withContext(Dispatchers.IO) {
-            restaurantDao.upsertRestaurants(restaurants)
+            val ids = restaurants.map { it.id }
+            val existing = restaurantDao.getRestaurantsByIds(ids).associateBy { it.id }
+            val merged = restaurants.map { entity ->
+                val existingWishlisted = existing[entity.id]?.wishlisted ?: false
+                entity.copy(wishlisted = entity.wishlisted || existingWishlisted)
+            }
+            restaurantDao.upsertRestaurants(merged)
         }
     }
 
     override suspend fun getRestaurant(id: String): RestaurantEntity {
         return withContext(Dispatchers.IO) {
             restaurantDao.getRestaurant(id)
+        }
+    }
+
+    override suspend fun setWishlisted(restaurantId: String, wishlisted: Boolean) {
+        withContext(Dispatchers.IO) {
+            restaurantDao.updateWishlisted(restaurantId, wishlisted)
         }
     }
 

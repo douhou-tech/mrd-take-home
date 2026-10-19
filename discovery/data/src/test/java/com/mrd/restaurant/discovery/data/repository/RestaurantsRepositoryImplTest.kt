@@ -47,4 +47,17 @@ class RestaurantsRepositoryImplTest {
         }
     }
 
+    @Test
+    fun `when setWishlisted then call both local and remote data sources`() = runTest {
+        val id = randomString(10)
+        val wishlisted = true
+
+        subject.setWishlisted(id, wishlisted)
+
+        coVerify {
+            localDataSource.setWishlisted(eq(id), eq(wishlisted))
+            remoteDataSource.setWishlisted(eq(id), eq(wishlisted))
+        }
+    }
+
 }

@@ -21,7 +21,11 @@ val restaurantDiscoveryDataModule = module {
         ).build()
     }
     single { get<RestaurantDiscoveryDatabase>().restaurantDao() }
-    single<LocalRestaurantsDataSource> { LocalRestaurantsDataSourceImpl(restaurantDao = get()) }
+    single<LocalRestaurantsDataSource> {
+        LocalRestaurantsDataSourceImpl(
+            restaurantDao = get()
+        )
+    }
     single<RemoteRestaurantsDataSource> {
         val logger: Logger = get()
         val restaurantsJson = try {

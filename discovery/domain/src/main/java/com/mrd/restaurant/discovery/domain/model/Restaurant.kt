@@ -12,7 +12,8 @@ data class Restaurant(
     val deliveryFeeInCents: Double = 0.0,
     val etaMinutes: Int = 0,
     val isOpen: Boolean = false,
-    val imageUrl: String = ""
+    val imageUrl: String = "",
+    val wishlisted: Boolean = false
 ) {
 
     fun displayName() = "$name ($location)"
