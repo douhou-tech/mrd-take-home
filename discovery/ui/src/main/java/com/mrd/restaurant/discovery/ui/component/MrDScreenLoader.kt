@@ -1,4 +1,4 @@
-package com.mrd.restaurant.discovery.feature.shared.component
+package com.mrd.restaurant.discovery.ui.component
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,7 +8,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 @Composable
-internal fun MrDScreenLoader() {
+fun MrDScreenLoader() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         CircularProgressIndicator()
     }

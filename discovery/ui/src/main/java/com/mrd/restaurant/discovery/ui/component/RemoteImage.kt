@@ -1,4 +1,4 @@
-package com.mrd.restaurant.discovery.feature.shared.component
+package com.mrd.restaurant.discovery.ui.component
 
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -8,10 +8,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.mrd.restaurant.discovery.feature.shared.shimmerEffect
+import com.mrd.restaurant.discovery.ui.shimmerEffect
 
 @Composable
-internal fun RemoteImage(
+fun RemoteImage(
     modifier: Modifier = Modifier,
     imageUrl: String
 ) {

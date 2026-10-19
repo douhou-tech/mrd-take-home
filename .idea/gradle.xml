@@ -29,6 +29,7 @@
             <option value="$PROJECT_DIR$/discovery/domain" />
             <option value="$PROJECT_DIR$/discovery/feature" />
             <option value="$PROJECT_DIR$/discovery/test" />
+            <option value="$PROJECT_DIR$/discovery/ui" />
           </set>
         </option>
       </GradleProjectSettings>

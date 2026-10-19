@@ -55,11 +55,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.mrd.restaurant.discovery.domain.model.Restaurant
-import com.mrd.restaurant.discovery.feature.shared.component.KeyboardVisibleContentMask
-import com.mrd.restaurant.discovery.feature.shared.component.MrDScreenLoader
-import com.mrd.restaurant.discovery.feature.shared.component.RemoteImage
-import com.mrd.restaurant.discovery.feature.shared.container.MrDScreenScaffold
-import com.mrd.restaurant.discovery.feature.ui.Dimens
+import com.mrd.restaurant.discovery.ui.component.KeyboardVisibleContentMask
+import com.mrd.restaurant.discovery.ui.component.MrDScreenLoader
+import com.mrd.restaurant.discovery.ui.component.RemoteImage
+import com.mrd.restaurant.discovery.ui.container.MrDScreenScaffold
+import com.mrd.restaurant.discovery.ui.Dimens
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable

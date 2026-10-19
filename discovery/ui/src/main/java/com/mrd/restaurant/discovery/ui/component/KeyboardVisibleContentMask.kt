@@ -1,4 +1,4 @@
-package com.mrd.restaurant.discovery.feature.shared.component
+package com.mrd.restaurant.discovery.ui.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,7 +16,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-internal fun KeyboardVisibleContentMask() {
+fun KeyboardVisibleContentMask() {
     val isKeyboardVisible = WindowInsets.isImeVisible
     if (!isKeyboardVisible) return
 

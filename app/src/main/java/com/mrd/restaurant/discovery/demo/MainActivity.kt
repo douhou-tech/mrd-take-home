@@ -14,7 +14,7 @@ import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDe
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.mrd.restaurant.discovery.demo.navigation.AppNavigator
-import com.mrd.restaurant.discovery.demo.ui.theme.TakeHomeDemoTheme
+import com.mrd.restaurant.discovery.ui.theme.TakeHomeDemoTheme
 import com.mrd.restaurant.discovery.feature.di.LocalSharedTransitionScope
 import org.koin.android.ext.android.get
 import org.koin.android.scope.AndroidScopeComponent

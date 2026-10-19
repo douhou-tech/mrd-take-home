@@ -1,4 +1,4 @@
-package com.mrd.restaurant.discovery.feature.shared.container
+package com.mrd.restaurant.discovery.ui.container
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 @Composable
-internal fun MrDScreenScaffold(
+fun MrDScreenScaffold(
     modifier: Modifier = Modifier,
     topBar: @Composable () -> Unit = {},
     content: @Composable BoxScope.() -> Unit

@@ -46,6 +46,7 @@ dependencies {
     implementation(project(":discovery:domain"))
     implementation(project(":discovery:data"))
     implementation(project(":discovery:feature"))
+    implementation(project(":discovery:ui"))
 
     // Ktor
     implementation(libs.ktor.client.core)

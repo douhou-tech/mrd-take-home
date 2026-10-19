@@ -1,4 +1,4 @@
-package com.mrd.restaurant.discovery.demo.ui.theme
+package com.mrd.restaurant.discovery.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

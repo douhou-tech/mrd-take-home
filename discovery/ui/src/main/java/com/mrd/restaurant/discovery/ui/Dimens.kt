@@ -1,4 +1,4 @@
-package com.mrd.restaurant.discovery.feature.ui
+package com.mrd.restaurant.discovery.ui
 
 import androidx.compose.ui.unit.dp
 

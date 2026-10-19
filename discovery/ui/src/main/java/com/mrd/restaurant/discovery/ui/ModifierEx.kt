@@ -1,4 +1,4 @@
-package com.mrd.restaurant.discovery.feature.shared
+package com.mrd.restaurant.discovery.ui
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -13,7 +13,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
-internal fun Modifier.shimmerEffect(): Modifier = composed {
+fun Modifier.shimmerEffect(): Modifier = composed {
     val transition = rememberInfiniteTransition(label = "ShimmerTransition")
     val translateAnim = transition.animateFloat(
         initialValue = 0f,

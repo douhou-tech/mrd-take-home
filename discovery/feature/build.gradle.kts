@@ -28,6 +28,7 @@ android {
 dependencies {
     implementation(project(":discovery:core:primitives"))
     implementation(project(":discovery:domain"))
+    implementation(project(":discovery:ui"))
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
     implementation(libs.material)
