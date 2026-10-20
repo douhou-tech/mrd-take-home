@@ -1,5 +1,6 @@
 package com.mrd.restaurant.discovery.demo
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -31,11 +32,13 @@ class MainActivity : ComponentActivity(), AndroidScopeComponent {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContent {
-            val navigator: AppNavigator = get<AppNavigator>().apply {
-                handleDeepLink(intent)
-            }
 
+        val navigator: AppNavigator = get()
+        if (savedInstanceState == null) {
+            navigator.handleDeepLink(intent)
+        }
+
+        setContent {
             TakeHomeDemoTheme {
                 SharedTransitionLayout {
                     CompositionLocalProvider(
@@ -65,5 +68,12 @@ class MainActivity : ComponentActivity(), AndroidScopeComponent {
                 }
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        val navigator: AppNavigator = get()
+        navigator.handleDeepLink(intent)
     }
 }

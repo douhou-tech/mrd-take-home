@@ -2,7 +2,10 @@ package com.mrd.restaurant.discovery.feature.di
 
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.runtime.compositionLocalOf
+import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.deeplink.DeepLinkMatcher
+import androidx.navigation3.runtime.deeplink.DeepLinkRequest
+import androidx.navigation3.runtime.deeplink.DeepLinkUri
 import androidx.navigation3.runtime.deeplink.UriDeepLinkMatcher
 import androidx.navigation3.runtime.deeplink.withBackStack
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
@@ -21,8 +24,6 @@ import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import org.koin.dsl.navigation3.navigation
-import androidx.core.net.toUri
-import androidx.navigation3.runtime.NavKey
 
 val LocalSharedTransitionScope = compositionLocalOf<SharedTransitionScope> {
     error("SharedTransitionScope not found")
@@ -76,15 +77,29 @@ val restaurantDiscoveryFeatureModule = module {
     }
 
     single<DeepLinkMatcher<NavKey, *>>(named(FeatureModuleQualifiers.RESTAURANT_DETAILS_DEEPLINK_MATCHER)) {
-        UriDeepLinkMatcher(
-            uriPattern = "https://staging.takehome.mrd.com/restaurant/details/{restaurantId}".toUri(),
-            serializer = serializer<FeatureNavKey.RestaurantDetails.ById>()
-        ).withBackStack { matchResult ->
-            val route = matchResult.key
-            listOf(
-                FeatureNavKey.RestaurantDiscovery,
-                route
+        val urlWithoutScheme = "staging.takehome.mrd.klc.com/restaurant/details/{restaurantId}"
+        val schemes = listOf("http", "https")
+        val matchers = schemes.map { scheme ->
+            UriDeepLinkMatcher(
+                uriPattern = DeepLinkUri("${scheme}://${urlWithoutScheme}"),
+                serializer = serializer<FeatureNavKey.RestaurantDetails.ById>()
             )
+        }.map { matcher ->
+            matcher.withBackStack { matchResult ->
+                val route = matchResult.key
+                listOf(
+                    FeatureNavKey.RestaurantDiscovery,
+                    route
+                )
+            }
+        }
+
+        object : DeepLinkMatcher<NavKey, DeepLinkMatcher.MatchResult<NavKey>>() {
+            override fun matchRequest(request: DeepLinkRequest): MatchResult<NavKey>? {
+                return matchers.firstNotNullOfOrNull { matcher ->
+                    matcher.match(request)
+                }
+            }
         }
     }
 }

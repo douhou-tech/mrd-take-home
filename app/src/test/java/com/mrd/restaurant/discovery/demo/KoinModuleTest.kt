@@ -6,6 +6,9 @@ import com.mrd.restaurant.discovery.domain.usecase.FilterRestaurantsUseCase
 import com.mrd.restaurant.discovery.data.di.restaurantDiscoveryDataModule
 import com.mrd.restaurant.discovery.demo.di.appModule
 import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.every
+import org.junit.Before
 import org.junit.Test
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.koinApplication
@@ -19,6 +22,13 @@ import com.mrd.restaurant.discovery.feature.screen.browse.RestaurantDiscoveryVie
 import org.koin.core.parameter.parametersOf
 
 class KoinModuleTest : KoinTest {
+
+    @Before
+    fun setup() {
+        mockkStatic(android.net.Uri::class)
+        val mockUri = mockk<android.net.Uri>(relaxed = true)
+        every { android.net.Uri.parse(any()) } returns mockUri
+    }
 
     @Test
     fun `verify FilterRestaurantsUseCase is resolved with RestaurantsRepositoryImpl`() {

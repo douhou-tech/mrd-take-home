@@ -56,8 +56,8 @@ class RestaurantsRepositoryImplTest {
         subject.setFavourite(id, favourite)
 
         coVerifyOrder {
-            remoteDataSource.setFavourite(eq(id), eq(favourite))
             localDataSource.setFavourite(eq(id), eq(favourite))
+            remoteDataSource.setFavourite(eq(id), eq(favourite))
         }
     }
 

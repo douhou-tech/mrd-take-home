@@ -11,7 +11,6 @@ import com.mrd.restaurant.discovery.feature.navigation.FeatureNavKey
 import com.mrd.restaurant.discovery.feature.navigation.FeatureNavigator
 import com.mrd.restaurant.discovery.ui.navigation.BackNavigator
 import com.mrd.restaurant.discovery.ui.navigation.DeepLinkNavigator
-import kotlin.math.log
 
 internal class AppNavigator(
     startDestination: NavKey,
@@ -42,6 +41,9 @@ internal class AppNavigator(
                 val resolvedStack = matchResult.backStack as List<NavKey>
                 backStack.clear()
                 backStack.addAll(resolvedStack)
+            } else {
+                backStack.clear()
+                backStack.add(FeatureNavKey.RestaurantDiscovery)
             }
         } catch (ex: Exception) {
             logger.error("Failed to handle deep link to: $uri", ex)
