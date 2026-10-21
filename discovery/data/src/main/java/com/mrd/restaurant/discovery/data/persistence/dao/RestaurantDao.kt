@@ -3,6 +3,7 @@ package com.mrd.restaurant.discovery.data.persistence.dao
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
+import com.mrd.restaurant.discovery.data.persistence.model.MenuItemEntity
 import com.mrd.restaurant.discovery.data.persistence.model.RestaurantEntity
 import com.mrd.restaurant.discovery.data.persistence.model.RestaurantEntityPagedResult
 import kotlinx.coroutines.flow.Flow
@@ -12,6 +13,9 @@ interface RestaurantDao {
 
     @Upsert
     suspend fun upsertRestaurants(restaurants: List<RestaurantEntity>)
+
+    @Upsert
+    suspend fun upsertMenuItems(menuItems: List<MenuItemEntity>)
 
     @Query(
         """
@@ -44,4 +48,6 @@ interface RestaurantDao {
     @Query("SELECT id FROM Restaurant WHERE favourite = 1")
     fun observeFavouriteIds(): Flow<List<String>>
 
+    @Query("SELECT * FROM MenuItem WHERE restaurantId = :restaurantId")
+    suspend fun getMenuItemsForRestaurant(restaurantId: String): List<MenuItemEntity>
 }

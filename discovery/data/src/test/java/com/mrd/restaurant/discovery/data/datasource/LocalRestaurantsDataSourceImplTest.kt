@@ -152,6 +152,28 @@ class LocalRestaurantsDataSourceImplTest {
     }
 
     @Test
+    fun `when getMenuItemsForRestaurant then call data source with correct arguments`() = runTest {
+        val id = randomString(10)
+
+        subject.getMenuItemsForRestaurant(id)
+
+        coVerify {
+            restaurantDao.getMenuItemsForRestaurant(eq(id))
+        }
+    }
+
+    @Test
+    fun `when upsertMenuItems then call data source with correct arguments`() = runTest {
+        val menuItems = listOf(mockk<com.mrd.restaurant.discovery.data.persistence.model.MenuItemEntity>())
+
+        subject.upsertMenuItems(menuItems)
+
+        coVerify {
+            restaurantDao.upsertMenuItems(eq(menuItems))
+        }
+    }
+
+    @Test
     fun `when setFavourite then update dao favourite field`() = runTest {
         val restaurantId = randomString(5)
         val favourite = true

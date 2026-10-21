@@ -4,6 +4,7 @@ import com.mrd.restaurant.discovery.core.primitive.model.PagedResult
 import com.mrd.restaurant.discovery.core.primitive.model.Pagination
 import com.mrd.restaurant.discovery.data.persistence.dao.RestaurantDao
 import com.mrd.restaurant.discovery.data.persistence.model.RestaurantEntity
+import com.mrd.restaurant.discovery.data.persistence.model.MenuItemEntity
 import com.mrd.restaurant.discovery.domain.repository.RestaurantFilter
 import com.mrd.restaurant.discovery.domain.repository.RestaurantFilters
 import kotlinx.coroutines.Dispatchers
@@ -16,7 +17,9 @@ interface LocalRestaurantsDataSource {
     fun observeFavouriteIds(): Flow<Set<String>>
     suspend fun getRestaurants(filters: RestaurantFilters, pagination: Pagination): PagedResult<RestaurantEntity>
     suspend fun upsertRestaurants(restaurants: List<RestaurantEntity>)
+    suspend fun upsertMenuItems(menuItems: List<MenuItemEntity>)
     suspend fun getRestaurant(id: String): RestaurantEntity?
+    suspend fun getMenuItemsForRestaurant(id: String): List<MenuItemEntity>
     suspend fun setFavourite(restaurantId: String, favourite: Boolean)
 }
 
@@ -71,9 +74,21 @@ class LocalRestaurantsDataSourceImpl(
         }
     }
 
+    override suspend fun upsertMenuItems(menuItems: List<MenuItemEntity>) {
+        withContext(Dispatchers.IO) {
+            restaurantDao.upsertMenuItems(menuItems)
+        }
+    }
+
     override suspend fun getRestaurant(id: String): RestaurantEntity {
         return withContext(Dispatchers.IO) {
             restaurantDao.getRestaurant(id)
+        }
+    }
+
+    override suspend fun getMenuItemsForRestaurant(id: String): List<MenuItemEntity> {
+        return withContext(Dispatchers.IO) {
+            restaurantDao.getMenuItemsForRestaurant(id)
         }
     }
 

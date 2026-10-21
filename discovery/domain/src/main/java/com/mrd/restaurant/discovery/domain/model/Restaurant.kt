@@ -14,7 +14,8 @@ data class Restaurant(
     val isOpen: Boolean = false,
     val imageUrl: String = "",
     val favourite: Boolean = false,
-    val wishlisted: Boolean = favourite
+    val wishlisted: Boolean = favourite,
+    val menuItems: List<MenuItem> = emptyList()
 ) {
 
     fun displayName() = "$name ($location)"

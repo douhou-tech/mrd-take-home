@@ -15,7 +15,11 @@ import org.junit.Test
 
 class RemoteRestaurantsDataSourceTest {
 
-    private val subject: RemoteRestaurantsDataSource = MockRemoteRestaurantsDataSource(loadRestaurantsJson())
+    private val subject: RemoteRestaurantsDataSource = MockRemoteRestaurantsDataSource(
+        restaurantsJson = loadRestaurantsJson(),
+        restaurantDetailsJson = loadRestaurantDetailsJson(),
+        restaurantDetailsMetaJson = loadRestaurantDetailsMetaJson()
+    )
 
     @Test
     fun `when getRestaurants without filters then return 100 Cape Town CBD restaurants paginated`() = runTest {
@@ -109,14 +113,41 @@ class RemoteRestaurantsDataSourceTest {
         result?.id shouldEqual id
     }
 
+    @Test
+    fun `when getRestaurantDetails with valid id then return correct details and meta`() = runTest {
+        val id = "cpt-cbd-001"
+
+        val result = subject.getRestaurantDetails(id)
+
+        result shouldNotEqual null
+        result?.first?.id shouldEqual id
+        result?.second shouldNotEqual null
+    }
+
+    @Test
+    fun `when getRestaurantDetails with invalid id then return null`() = runTest {
+        val id = "invalid-id"
+
+        val result = subject.getRestaurantDetails(id)
+
+        result shouldBe null
+    }
+
 }
 
-private fun loadRestaurantsJson(): String {
+private fun loadRestaurantsJson() = readResourceFileText("mocks/restaurants.json")
+private fun loadRestaurantDetailsJson() = readResourceFileText("mocks/restaurant_details.json")
+private fun loadRestaurantDetailsMetaJson() = readResourceFileText("mocks/restaurant_details_meta.json")
+
+private fun readResourceFileText(
+    path: String,
+    default: String = "{}"
+): String {
     return try {
-        Thread.currentThread().contextClassLoader?.getResource("mocks/restaurants.json")?.readText()
-            ?: RemoteRestaurantsDataSourceTest::class.java.classLoader?.getResource("mocks/restaurants.json")?.readText()
-            ?: "[]"
+        val file = Thread.currentThread().contextClassLoader?.getResource(path)
+            ?: RemoteRestaurantsDataSourceTest::class.java.classLoader?.getResource(path)
+        file?.readText() ?: default
     } catch (_: Exception) {
-        "[]"
+        default
     }
 }

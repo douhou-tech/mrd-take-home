@@ -1,12 +1,13 @@
 package com.mrd.restaurant.discovery.data.mapper
 
 import com.mrd.restaurant.discovery.domain.model.Restaurant
+import com.mrd.restaurant.discovery.domain.model.MenuItem
 import com.mrd.restaurant.discovery.data.persistence.model.RestaurantEntity
+import com.mrd.restaurant.discovery.data.persistence.model.MenuItemEntity
 import com.mrd.restaurant.discovery.data.remote.model.RestaurantRemoteModel
 
-
 internal object RestaurantsMapper {
-    fun RestaurantRemoteModel.toDomain(): Restaurant {
+    fun RestaurantRemoteModel.toDomain(menuItems: List<MenuItem> = emptyList()): Restaurant {
         return Restaurant(
             id = id,
             name = name,
@@ -17,7 +18,8 @@ internal object RestaurantsMapper {
             etaMinutes = etaMinutes,
             isOpen = isOpen,
             imageUrl = imageUrl,
-            favourite = favourite
+            favourite = favourite,
+            menuItems = menuItems
         )
     }
 
@@ -36,7 +38,7 @@ internal object RestaurantsMapper {
         )
     }
 
-    fun RestaurantEntity.toDomain(): Restaurant {
+    fun RestaurantEntity.toDomain(menuItems: List<MenuItem> = emptyList()): Restaurant {
         return Restaurant(
             id = id,
             name = name,
@@ -47,7 +49,21 @@ internal object RestaurantsMapper {
             etaMinutes = etaMinutes,
             isOpen = isOpen,
             imageUrl = imageUrl,
-            favourite = favourite
+            favourite = favourite,
+            menuItems = menuItems
+        )
+    }
+
+    fun MenuItemEntity.toDomain(): MenuItem {
+        return MenuItem(
+            id = id,
+            restaurantId = restaurantId,
+            category = category,
+            name = name,
+            description = description,
+            priceInCents = priceInCents,
+            percentageOff = percentageOff,
+            unavailable = unavailable
         )
     }
 }

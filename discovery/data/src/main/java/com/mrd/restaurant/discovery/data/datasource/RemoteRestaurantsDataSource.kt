@@ -2,6 +2,8 @@ package com.mrd.restaurant.discovery.data.datasource
 
 import com.mrd.restaurant.discovery.core.primitive.model.PagedResult
 import com.mrd.restaurant.discovery.core.primitive.model.Pagination
+import com.mrd.restaurant.discovery.data.remote.model.RestaurantDetailsMetaRemoteModel
+import com.mrd.restaurant.discovery.data.remote.model.RestaurantDetailsRemoteModel
 import com.mrd.restaurant.discovery.data.remote.model.RestaurantRemoteModel
 import com.mrd.restaurant.discovery.domain.repository.RestaurantFilter
 import com.mrd.restaurant.discovery.domain.repository.RestaurantFilters
@@ -19,11 +21,15 @@ interface RemoteRestaurantsDataSource {
 
     suspend fun getRestaurant(id: String): RestaurantRemoteModel?
 
+    suspend fun getRestaurantDetails(id: String): Pair<com.mrd.restaurant.discovery.data.remote.model.RestaurantDetailsRemoteModel, com.mrd.restaurant.discovery.data.remote.model.RestaurantDetailsMetaRemoteModel>?
+
     suspend fun setFavourite(restaurantId: String, favourite: Boolean)
 }
 
 internal class MockRemoteRestaurantsDataSource(
     val restaurantsJson: String,
+    val restaurantDetailsJson: String = "[]",
+    val restaurantDetailsMetaJson: String = "{}"
 ) : RemoteRestaurantsDataSource {
 
     private val json = Json {
@@ -33,6 +39,14 @@ internal class MockRemoteRestaurantsDataSource(
     }
     private val allRestaurants: List<RestaurantRemoteModel> by lazy {
         json.decodeFromString(restaurantsJson)
+    }
+
+    private val allRestaurantDetails: List<RestaurantDetailsRemoteModel> by lazy {
+        json.decodeFromString(restaurantDetailsJson)
+    }
+
+    private val allRestaurantDetailsMeta: Map<String, RestaurantDetailsMetaRemoteModel> by lazy {
+        json.decodeFromString(restaurantDetailsMetaJson)
     }
 
     private val favouriteMap = mutableMapOf<String, Boolean>()
@@ -82,6 +96,13 @@ internal class MockRemoteRestaurantsDataSource(
     override suspend fun getRestaurant(id: String): RestaurantRemoteModel? {
         delay(2000L.milliseconds)
         return allRestaurants.firstOrNull { it.id == id }
+    }
+
+    override suspend fun getRestaurantDetails(id: String): Pair<RestaurantDetailsRemoteModel, RestaurantDetailsMetaRemoteModel>? {
+        delay(2000L.milliseconds)
+        val details = allRestaurantDetails.firstOrNull { it.id == id } ?: return null
+        val meta = allRestaurantDetailsMeta[id] ?: return null
+        return details to meta
     }
 
     override suspend fun setFavourite(restaurantId: String, favourite: Boolean) {

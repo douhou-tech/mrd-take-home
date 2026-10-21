@@ -36,15 +36,22 @@ class RestaurantsRepositoryImplTest {
     }
 
     @Test
-    fun `when getRestaurants then call remote first, persist locally, and get from local`() = runTest {
+    fun `when getRestaurant then call remote first, persist locally, and get from local`() = runTest {
         val id = randomString(10)
+        
+        val details = mockk<com.mrd.restaurant.discovery.data.remote.model.RestaurantDetailsRemoteModel>(relaxed = true)
+        val meta = mockk<com.mrd.restaurant.discovery.data.remote.model.RestaurantDetailsMetaRemoteModel>(relaxed = true)
+        
+        io.mockk.coEvery { remoteDataSource.getRestaurantDetails(any()) } returns Pair(details, meta)
 
         subject.getRestaurant(id)
 
         coVerify {
-            remoteDataSource.getRestaurant(eq(id))
+            remoteDataSource.getRestaurantDetails(eq(id))
             localDataSource.upsertRestaurants(any())
+            localDataSource.upsertMenuItems(any())
             localDataSource.getRestaurant(eq(id))
+            localDataSource.getMenuItemsForRestaurant(eq(id))
         }
     }
 

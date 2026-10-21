@@ -39,16 +39,37 @@ class RestaurantsRepositoryImpl(
     }
 
     override suspend fun getRestaurant(id: String): Restaurant? {
-        val remoteResult = remoteDataSource.getRestaurant(id)
-        return remoteResult?.toEntity()?.let { entity ->
-            localDataSource.upsertRestaurants(listOf(entity))
-            getLocalRestaurant(id)
+        val remoteDetails = remoteDataSource.getRestaurantDetails(id)
+        if (remoteDetails != null) {
+            val (detailsRemote, metaRemote) = remoteDetails
+            val restaurantEntity = detailsRemote.restaurantInfo.toEntity()
+            localDataSource.upsertRestaurants(listOf(restaurantEntity))
+            
+            val menuItemsEntities = detailsRemote.menu.flatMap { category ->
+                category.items.map { item ->
+                    val percentageOff = if (metaRemote.onSale.itemIds.contains(item.id)) metaRemote.onSale.percentageOff else null
+                    val unavailable = metaRemote.unavailable.contains(item.id)
+                    com.mrd.restaurant.discovery.data.persistence.model.MenuItemEntity(
+                        id = item.id,
+                        restaurantId = id,
+                        category = category.category,
+                        name = item.name,
+                        description = item.description,
+                        priceInCents = item.priceInCents,
+                        percentageOff = percentageOff,
+                        unavailable = unavailable
+                    )
+                }
+            }
+            localDataSource.upsertMenuItems(menuItemsEntities)
         }
+        return getLocalRestaurant(id)
     }
 
     override suspend fun getLocalRestaurant(id: String): Restaurant? {
         val localResult = localDataSource.getRestaurant(id)
-        return localResult?.toDomain()
+        val localMenuItems = localDataSource.getMenuItemsForRestaurant(id).map { it.toDomain() }
+        return localResult?.toDomain(localMenuItems)
     }
 
     override suspend fun setFavourite(restaurantId: String, favourite: Boolean) {
