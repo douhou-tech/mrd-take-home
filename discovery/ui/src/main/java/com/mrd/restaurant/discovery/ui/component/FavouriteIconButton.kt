@@ -28,7 +28,7 @@ fun FavouriteIconButton(
     }
     val tint = when {
         favourite -> Color.Red
-        else -> MaterialTheme.colorScheme.onSurface
+        else -> Color.White
     }
     FilledIconButton(
         modifier = modifier,

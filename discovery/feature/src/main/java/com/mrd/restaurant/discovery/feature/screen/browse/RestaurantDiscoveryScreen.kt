@@ -254,7 +254,11 @@ private fun RestaurantFilterSection(
         FilterChip(
             selected = isOpenNow,
             onClick = { onToggleOpenNow(!isOpenNow) },
-            label = { Text(stringResource(R.string.restaurant_discovery_open_now)) }
+            label = { Text(stringResource(R.string.restaurant_discovery_open_now)) },
+            colors = androidx.compose.material3.FilterChipDefaults.filterChipColors(
+                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                selectedLabelColor = MaterialTheme.colorScheme.onPrimary
+            )
         )
         Spacer(modifier = Modifier.weight(1f))
         Text(stringResource(R.string.restaurant_discovery_results_found, totalCount))
