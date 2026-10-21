@@ -1,15 +1,15 @@
 package com.mrd.restaurant.discovery.data.di
 
 import androidx.room.Room
-import com.mrd.restaurant.discovery.domain.repository.RestaurantsRepository
-import com.mrd.restaurant.discovery.core.logging.Logger
 import com.mrd.restaurant.discovery.data.datasource.LocalRestaurantsDataSource
 import com.mrd.restaurant.discovery.data.datasource.LocalRestaurantsDataSourceImpl
 import com.mrd.restaurant.discovery.data.datasource.MockRemoteRestaurantsDataSource
 import com.mrd.restaurant.discovery.data.datasource.RemoteRestaurantsDataSource
 import com.mrd.restaurant.discovery.data.persistence.RestaurantDiscoveryDatabase
 import com.mrd.restaurant.discovery.data.repository.RestaurantsRepositoryImpl
+import com.mrd.restaurant.discovery.domain.repository.RestaurantsRepository
 import org.koin.android.ext.koin.androidContext
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 val restaurantDiscoveryDataModule = module {
@@ -26,9 +26,8 @@ val restaurantDiscoveryDataModule = module {
             restaurantDao = get()
         )
     }
-    single<RemoteRestaurantsDataSource> {
-        val logger: Logger = get()
-        val restaurantsJson = try {
+    single<String>(named(DataModuleQualifiers.RESTAURANTS_JSON_MOCK)) {
+        try {
             androidContext().assets.open("mocks/restaurants.json")
                 .bufferedReader()
                 .use {
@@ -38,7 +37,23 @@ val restaurantDiscoveryDataModule = module {
             logger.error("Failed to get restaurants mock json data")
             "[]"
         }
-        MockRemoteRestaurantsDataSource(restaurantsJson)
+    }
+    single<String>(named(DataModuleQualifiers.RESTAURANTS_DETAILS_JSON_MOCK)) {
+        try {
+            androidContext().assets.open("mocks/restaurant_details.json")
+                .bufferedReader()
+                .use {
+                    it.readText()
+                }
+        } catch (e: Exception) {
+            logger.error("Failed to get restaurant details mock json data")
+            "[]"
+        }
+    }
+    single<RemoteRestaurantsDataSource> {
+        val restaurantsJson = get<String>(named(DataModuleQualifiers.RESTAURANTS_JSON_MOCK))
+        val restaurantDetailsJson = get<String>(named(DataModuleQualifiers.RESTAURANTS_DETAILS_JSON_MOCK))
+        MockRemoteRestaurantsDataSource(restaurantsJson, restaurantDetailsJson)
     }
     single<RestaurantsRepository> {
         RestaurantsRepositoryImpl(
@@ -46,4 +61,9 @@ val restaurantDiscoveryDataModule = module {
             remoteDataSource = get(),
         )
     }
+}
+
+object DataModuleQualifiers {
+    const val RESTAURANTS_JSON_MOCK = "restaurants_json_mock"
+    const val RESTAURANTS_DETAILS_JSON_MOCK = "restaurants_details_json_mock"
 }

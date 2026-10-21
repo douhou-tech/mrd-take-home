@@ -18,6 +18,10 @@ interface RestaurantsRepository {
         id: String
     ): Restaurant?
 
+    suspend fun getMenuItems(
+        id: String
+    ): List<com.mrd.restaurant.discovery.domain.model.MenuItem>
+
     suspend fun getLocalRestaurant(
         id: String
     ): Restaurant?

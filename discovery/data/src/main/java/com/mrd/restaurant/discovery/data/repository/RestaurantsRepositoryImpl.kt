@@ -41,14 +41,13 @@ class RestaurantsRepositoryImpl(
     override suspend fun getRestaurant(id: String): Restaurant? {
         val remoteDetails = remoteDataSource.getRestaurantDetails(id)
         if (remoteDetails != null) {
-            val (detailsRemote, metaRemote) = remoteDetails
-            val restaurantEntity = detailsRemote.restaurantInfo.toEntity()
+            val restaurantEntity = remoteDetails.restaurantInfo.toEntity()
             localDataSource.upsertRestaurants(listOf(restaurantEntity))
             
-            val menuItemsEntities = detailsRemote.menu.flatMap { category ->
+            val menuItemsEntities = remoteDetails.menu.flatMap { category ->
                 category.items.map { item ->
-                    val percentageOff = if (metaRemote.onSale.itemIds.contains(item.id)) metaRemote.onSale.percentageOff else null
-                    val unavailable = metaRemote.unavailable.contains(item.id)
+//                    val percentageOff = if (metaRemote.onSale.itemIds.contains(item.id)) metaRemote.onSale.percentageOff else null
+//                    val unavailable = metaRemote.unavailable.contains(item.id)
                     com.mrd.restaurant.discovery.data.persistence.model.MenuItemEntity(
                         id = item.id,
                         restaurantId = id,
@@ -56,14 +55,18 @@ class RestaurantsRepositoryImpl(
                         name = item.name,
                         description = item.description,
                         priceInCents = item.priceInCents,
-                        percentageOff = percentageOff,
-                        unavailable = unavailable
+                        percentageOff = 0,
+                        unavailable = false
                     )
                 }
             }
             localDataSource.upsertMenuItems(menuItemsEntities)
         }
         return getLocalRestaurant(id)
+    }
+
+    override suspend fun getMenuItems(id: String): List<com.mrd.restaurant.discovery.domain.model.MenuItem> {
+        return localDataSource.getMenuItemsForRestaurant(id).map { it.toDomain() }
     }
 
     override suspend fun getLocalRestaurant(id: String): Restaurant? {

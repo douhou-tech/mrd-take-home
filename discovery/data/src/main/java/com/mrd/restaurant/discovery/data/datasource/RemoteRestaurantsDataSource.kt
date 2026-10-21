@@ -21,7 +21,7 @@ interface RemoteRestaurantsDataSource {
 
     suspend fun getRestaurant(id: String): RestaurantRemoteModel?
 
-    suspend fun getRestaurantDetails(id: String): Pair<com.mrd.restaurant.discovery.data.remote.model.RestaurantDetailsRemoteModel, com.mrd.restaurant.discovery.data.remote.model.RestaurantDetailsMetaRemoteModel>?
+    suspend fun getRestaurantDetails(id: String): RestaurantDetailsRemoteModel?
 
     suspend fun setFavourite(restaurantId: String, favourite: Boolean)
 }
@@ -98,11 +98,11 @@ internal class MockRemoteRestaurantsDataSource(
         return allRestaurants.firstOrNull { it.id == id }
     }
 
-    override suspend fun getRestaurantDetails(id: String): Pair<RestaurantDetailsRemoteModel, RestaurantDetailsMetaRemoteModel>? {
+    override suspend fun getRestaurantDetails(id: String): RestaurantDetailsRemoteModel? {
         delay(2000L.milliseconds)
         val details = allRestaurantDetails.firstOrNull { it.id == id } ?: return null
-        val meta = allRestaurantDetailsMeta[id] ?: return null
-        return details to meta
+//        val meta = allRestaurantDetailsMeta[id] ?: return null
+        return details
     }
 
     override suspend fun setFavourite(restaurantId: String, favourite: Boolean) {
