@@ -55,6 +55,7 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mrd.restaurant.discovery.domain.model.MenuItem
 import com.mrd.restaurant.discovery.domain.model.Restaurant
+import com.mrd.restaurant.discovery.feature.ui.component.RestaurantClosedOverlay
 import com.mrd.restaurant.discovery.ui.Dimens
 import com.mrd.restaurant.discovery.ui.component.FavouriteIconButton
 import com.mrd.restaurant.discovery.ui.component.MrDIconButton
@@ -191,6 +192,10 @@ private fun RestaurantDetailsContent(
                                     imageUrl = restaurant.imageUrl
                                 )
                             }
+
+                            RestaurantClosedOverlay(
+                                isOpen = restaurant.isOpen
+                            )
                         }
 
                     }

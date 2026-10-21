@@ -55,6 +55,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.mrd.restaurant.discovery.domain.model.Restaurant
+import com.mrd.restaurant.discovery.feature.ui.component.RestaurantClosedOverlay
 import com.mrd.restaurant.discovery.ui.Dimens
 import com.mrd.restaurant.discovery.ui.component.FavouriteIconButton
 import com.mrd.restaurant.discovery.ui.component.KeyboardVisibleContentMask
@@ -359,21 +360,9 @@ private fun RestaurantItem(
                     )
                 }
 
-                if (!restaurant.isOpen) {
-                    Box(
-                        modifier = Modifier
-                            .background(Color.Black.copy(alpha = 0.6f))
-                            .matchParentSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            style = MaterialTheme.typography.bodyLarge,
-                            text = "Closed"
-                        )
-                    }
-
-                }
-
+                RestaurantClosedOverlay(
+                    isOpen = restaurant.isOpen
+                )
             }
             Text(text = restaurant.displayName(), style = MaterialTheme.typography.titleMedium)
             Text(text = restaurant.cuisines, style = MaterialTheme.typography.bodyMedium)
