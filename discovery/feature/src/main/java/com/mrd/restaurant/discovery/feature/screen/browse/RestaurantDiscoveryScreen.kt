@@ -52,8 +52,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.mrd.restaurant.discovery.feature.R
 import com.mrd.restaurant.discovery.domain.model.Restaurant
 import com.mrd.restaurant.discovery.feature.ui.component.RestaurantClosedOverlay
 import com.mrd.restaurant.discovery.ui.Dimens
@@ -64,6 +66,8 @@ import com.mrd.restaurant.discovery.ui.component.RemoteImage
 import com.mrd.restaurant.discovery.ui.container.MrDScreenScaffold
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import com.mrd.restaurant.discovery.ui.theme.SearchBackground
+import com.mrd.restaurant.discovery.ui.theme.MrDLightBlue
 import kotlin.time.Duration.Companion.milliseconds
 
 private const val LOAD_MORE_THRESHOLD = 5
@@ -162,7 +166,6 @@ fun RestaurantDiscoveryScreen(
     }
 }
 
-// TODO move colors to Color.kt and apply to a theme
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun RestaurantSearchContent(
@@ -209,12 +212,12 @@ private fun RestaurantSearchContent(
                     .imePadding()
                     .padding(vertical = Dimens.SpacingSmall)
                     .clip(RoundedCornerShape(32.dp))
-                    .background(Color(0xFFFAFAFA))
+                    .background(SearchBackground)
                     .fillMaxWidth(width),
                 state = state,
                 shape = RoundedCornerShape(32.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFF6dcff4),
+                    focusedBorderColor = MrDLightBlue,
                     unfocusedBorderColor = Color.Transparent,
                     focusedTextColor = Color.DarkGray,
                     unfocusedTextColor = Color.DarkGray,
@@ -228,7 +231,7 @@ private fun RestaurantSearchContent(
                 },
                 placeholder = {
                     Text(
-                        text = "Search restaurants",
+                        text = stringResource(R.string.restaurant_discovery_search_placeholder),
                         color = Color.DarkGray
                     )
                 },
@@ -251,24 +254,24 @@ private fun RestaurantFilterSection(
         FilterChip(
             selected = isOpenNow,
             onClick = { onToggleOpenNow(!isOpenNow) },
-            label = { Text("Open Now") }
+            label = { Text(stringResource(R.string.restaurant_discovery_open_now)) }
         )
         Spacer(modifier = Modifier.weight(1f))
-        Text("$totalCount results found")
+        Text(stringResource(R.string.restaurant_discovery_results_found, totalCount))
     }
 }
 
 @Composable
 private fun EmptyResultsContent() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("No restaurants found.")
+        Text(stringResource(R.string.restaurant_discovery_no_results))
     }
 }
 
 @Composable
 private fun ErrorResultsContent(message: String) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("Error: $message")
+        Text(stringResource(R.string.restaurant_discovery_error, message))
     }
 }
 
@@ -367,7 +370,7 @@ private fun RestaurantItem(
             Text(text = restaurant.displayName(), style = MaterialTheme.typography.titleMedium)
             Text(text = restaurant.cuisines, style = MaterialTheme.typography.bodyMedium)
             Text(
-                text = "Rating: ${restaurant.rating} ⭐ | ETA: ${restaurant.etaMinutes} mins",
+                text = stringResource(R.string.restaurant_discovery_rating_eta, restaurant.rating, restaurant.etaMinutes),
                 style = MaterialTheme.typography.bodySmall
             )
         }

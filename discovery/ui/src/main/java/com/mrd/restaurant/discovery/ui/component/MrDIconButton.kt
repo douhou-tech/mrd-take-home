@@ -7,9 +7,9 @@ import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import com.mrd.restaurant.discovery.ui.theme.Black70
 
 @Composable
 fun MrDIconButton(
@@ -21,7 +21,7 @@ fun MrDIconButton(
         modifier = modifier,
         onClick = onClick,
         colors = IconButtonColors(
-            containerColor = Color.Black.copy(alpha = 0.7f),
+            containerColor = Black70,
             contentColor = MaterialTheme.colorScheme.onSurface,
             disabledContainerColor = MaterialTheme.colorScheme.surface,
             disabledContentColor = MaterialTheme.colorScheme.onSurface

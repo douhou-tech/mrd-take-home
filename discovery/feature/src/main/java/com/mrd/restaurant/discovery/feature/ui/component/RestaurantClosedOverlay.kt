@@ -8,20 +8,22 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import com.mrd.restaurant.discovery.ui.theme.Black60
+import com.mrd.restaurant.discovery.feature.R
 
 @Composable
 fun BoxScope.RestaurantClosedOverlay(isOpen: Boolean) {
     if (!isOpen) {
         Box(
             modifier = Modifier
-                .background(Color.Black.copy(alpha = 0.6f))
+                .background(Black60)
                 .matchParentSize(),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 style = MaterialTheme.typography.bodyLarge,
-                text = "Closed"
+                text = stringResource(R.string.restaurant_closed)
             )
         }
     }

@@ -11,8 +11,8 @@ import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import com.mrd.restaurant.discovery.ui.theme.Black40
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -24,7 +24,7 @@ fun KeyboardVisibleContentMask() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.4f))
+            .background(Black40)
             .clickable(
                 indication = null,
                 interactionSource = remember { MutableInteractionSource() }

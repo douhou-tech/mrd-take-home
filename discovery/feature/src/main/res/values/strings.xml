@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="restaurant_eta_mins">ETA: %1$d mins</string>
+    <string name="error_failed_to_load_menu_items">Failed to load menu items</string>
+    <string name="error_no_menu_items">No menu items</string>
+    <string name="price_format">R%1$s</string>
+    <string name="restaurant_discovery_open_now">Open Now</string>
+    <string name="restaurant_discovery_results_found">%1$d results found</string>
+    <string name="restaurant_discovery_no_results">No restaurants found.</string>
+    <string name="restaurant_discovery_error">Error: %1$s</string>
+    <string name="restaurant_discovery_search_placeholder">Search restaurants</string>
+    <string name="restaurant_discovery_rating_eta">Rating: %1$s ⭐ | ETA: %2$d mins</string>
+    <string name="restaurant_closed">Closed</string>
+</resources>

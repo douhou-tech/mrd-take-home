@@ -11,7 +11,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.mrd.restaurant.discovery.ui.R
+import com.mrd.restaurant.discovery.ui.theme.Black70
 
 @Composable
 fun FavouriteIconButton(
@@ -31,7 +34,7 @@ fun FavouriteIconButton(
         modifier = modifier,
         onClick = onClick,
         colors = IconButtonColors(
-            containerColor = Color.Black.copy(alpha = 0.7f),
+            containerColor = Black70,
             contentColor = tint,
             disabledContainerColor = MaterialTheme.colorScheme.surface,
             disabledContentColor = MaterialTheme.colorScheme.onSurface
@@ -40,7 +43,7 @@ fun FavouriteIconButton(
         content = {
             Icon(
                 imageVector = icon,
-                contentDescription = "Favourite",
+                contentDescription = stringResource(R.string.content_description_favourite),
             )
         }
     )

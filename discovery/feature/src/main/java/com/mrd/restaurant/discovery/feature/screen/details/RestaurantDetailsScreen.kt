@@ -48,11 +48,14 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.mrd.restaurant.discovery.feature.R
+import com.mrd.restaurant.discovery.ui.theme.Black40
 import com.mrd.restaurant.discovery.domain.model.MenuItem
 import com.mrd.restaurant.discovery.domain.model.Restaurant
 import com.mrd.restaurant.discovery.feature.ui.component.RestaurantClosedOverlay
@@ -227,7 +230,7 @@ private fun RestaurantDetailsContent(
                             Spacer(modifier = Modifier.height(Dimens.SpacingSmall))
                             DescriptionTextItem(
                                 icon = Icons.Default.DateRange,
-                                text = "ETA: ${restaurant.etaMinutes} mins"
+                                text = stringResource(R.string.restaurant_eta_mins, restaurant.etaMinutes)
                             )
                             Spacer(modifier = Modifier.height(Dimens.SpacingSmall))
                             Text(
@@ -262,7 +265,7 @@ private fun RestaurantMenu(
             isLoadingMenu -> MrDScreenLoader()
             isMenuError -> {
                 MrDRetryContent(
-                    message = "Failed to load menu items",
+                    message = stringResource(R.string.error_failed_to_load_menu_items),
                     onRetry = {
                         onIntent(RestaurantDetailsIntent.Retry)
                     }
@@ -270,7 +273,7 @@ private fun RestaurantMenu(
             }
             menuItems.isNullOrEmpty() -> {
                 MrDRetryContent(
-                    message = "No menu items",
+                    message = stringResource(R.string.error_no_menu_items),
                     onRetry = {
                         onIntent(RestaurantDetailsIntent.Retry)
                     }
@@ -338,8 +341,9 @@ private fun MenuItemRow(item: MenuItem) {
                 text = item.name,
                 style = MaterialTheme.typography.titleMedium
             )
+            val priceStr = String.format(java.util.Locale.US, "%.2f", item.priceInCents / 100.0)
             Text(
-                text = "R${String.format(java.util.Locale.US, "%.2f", item.priceInCents / 100.0)}",
+                text = stringResource(R.string.price_format, priceStr),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -376,7 +380,7 @@ private fun DescriptionTextItem(
 @Composable
 private fun GradientShadowBox(
     modifier: Modifier = Modifier,
-    shadowColor: Color = Color.Black.copy(alpha = 0.4f),
+    shadowColor: Color = Black40,
     shadowHeight: Dp = 48.dp,
     isRevealed: Boolean = true,
     overlayContent: @Composable () -> Unit = {},
