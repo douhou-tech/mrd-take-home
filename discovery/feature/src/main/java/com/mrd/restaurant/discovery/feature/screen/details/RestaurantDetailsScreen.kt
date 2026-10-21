@@ -21,7 +21,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
@@ -45,6 +47,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -78,7 +84,33 @@ fun RestaurantDetailsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    MrDScreenScaffold {
+    val listState = rememberLazyListState()
+    var showDetails by remember { mutableStateOf(true) }
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            var accumulatedScroll = 0f
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                val delta = available.y
+                if (delta > 0 && accumulatedScroll < 0) accumulatedScroll = 0f
+                if (delta < 0 && accumulatedScroll > 0) accumulatedScroll = 0f
+                
+                accumulatedScroll += delta
+
+                if (accumulatedScroll < -50f) {
+                    showDetails = false
+                    accumulatedScroll = 0f
+                } else if (accumulatedScroll > 50f) {
+                    showDetails = true
+                    accumulatedScroll = 0f
+                }
+                return Offset.Zero
+            }
+        }
+    }
+
+    MrDScreenScaffold(
+        modifier = Modifier.nestedScroll(nestedScrollConnection)
+    ) {
         when (val state = uiState) {
             is RestaurantDetailsUiState.Error -> {
                 MrDRetryContent(
@@ -97,6 +129,7 @@ fun RestaurantDetailsScreen(
                 RestaurantDetailsContent(
                     visibilityScope = visibilityScope,
                     sharedTransitionScope = sharedTransitionScope,
+                    showDetails = showDetails,
                     restaurant = state.data.restaurant,
                     favourite = state.data.favourite,
                     onIntent = viewModel::onIntent,
@@ -113,6 +146,7 @@ fun RestaurantDetailsScreen(
                             )
                             is RestaurantDetailsUiState.Success -> {
                                 RestaurantMenu(
+                                    listState = listState,
                                     menuItems = state.data.menuItems,
                                     onIntent = viewModel::onIntent
                                 )
@@ -129,6 +163,7 @@ fun RestaurantDetailsScreen(
 private fun RestaurantDetailsContent(
     sharedTransitionScope: SharedTransitionScope,
     visibilityScope: AnimatedContentScope,
+    showDetails: Boolean,
     restaurant: Restaurant,
     favourite: Boolean,
     onIntent: (RestaurantDetailsIntent) -> Unit,
@@ -146,63 +181,72 @@ private fun RestaurantDetailsContent(
             .fillMaxSize()
             .clipToBounds()
     ) {
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            stickyHeader {
-                Column(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    GradientShadowBox(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .zIndex(2f),
-                        isRevealed = isRevealed,
-                        overlayContent = {
-                            AnimatedVisibility(
-                                visible = isRevealed,
-                                enter = fadeIn(animationSpec = tween(500)),
-                                exit = fadeOut(animationSpec = tween(300))
-                            ) {
-                                Row(
-                                    modifier = Modifier.fillMaxSize().zIndex(1f),
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    MrDIconButton(
-                                        icon = Icons.AutoMirrored.Default.ArrowBack,
-                                        onClick = {
-                                            onIntent(RestaurantDetailsIntent.Back)
-                                        }
-                                    )
 
-                                    FavouriteIconButton(
-                                        favourite = favourite,
-                                        onClick = {
-                                            onIntent(RestaurantDetailsIntent.ToggleFavourite)
-                                        }
-                                    )
+        AnimatedVisibility(
+            showDetails
+        ) {
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                stickyHeader {
+                    Column(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        GradientShadowBox(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .zIndex(2f),
+                            isRevealed = isRevealed,
+                            overlayContent = {
+                                AnimatedVisibility(
+                                    visible = isRevealed,
+                                    enter = fadeIn(animationSpec = tween(500)),
+                                    exit = fadeOut(animationSpec = tween(300))
+                                ) {
+                                    Row(
+                                        modifier = Modifier.fillMaxSize().zIndex(1f),
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        MrDIconButton(
+                                            icon = Icons.AutoMirrored.Default.ArrowBack,
+                                            onClick = {
+                                                onIntent(RestaurantDetailsIntent.Back)
+                                            }
+                                        )
+
+                                        FavouriteIconButton(
+                                            favourite = favourite,
+                                            onClick = {
+                                                onIntent(RestaurantDetailsIntent.ToggleFavourite)
+                                            }
+                                        )
+                                    }
                                 }
                             }
-                        }
-                    ) {
-                        Box(modifier = Modifier.zIndex(0f)) {
-                            with(sharedTransitionScope) {
-                                RemoteImage(
-                                    modifier = Modifier.sharedElement(
-                                        sharedTransitionScope.rememberSharedContentState(key = restaurant.id),
-                                        animatedVisibilityScope = visibilityScope,
-                                    ),
-                                    imageUrl = restaurant.imageUrl
+                        ) {
+                            Box(modifier = Modifier.zIndex(0f)) {
+                                with(sharedTransitionScope) {
+                                    RemoteImage(
+                                        modifier = Modifier.sharedElement(
+                                            sharedTransitionScope.rememberSharedContentState(key = restaurant.id),
+                                            animatedVisibilityScope = visibilityScope,
+                                        ),
+                                        imageUrl = restaurant.imageUrl
+                                    )
+                                }
+
+                                RestaurantClosedOverlay(
+                                    isOpen = restaurant.isOpen
                                 )
                             }
 
-                            RestaurantClosedOverlay(
-                                isOpen = restaurant.isOpen
-                            )
                         }
 
                     }
+                }
 
+
+                item {
                     AnimatedVisibility(
                         visible = isRevealed,
                         modifier = Modifier.zIndex(1f),
@@ -242,9 +286,10 @@ private fun RestaurantDetailsContent(
                         }
                     }
                 }
-            }
 
+            }
         }
+
 
         menuContent()
     }
@@ -253,6 +298,7 @@ private fun RestaurantDetailsContent(
 
 @Composable
 private fun RestaurantMenu(
+    listState: LazyListState = rememberLazyListState(),
     isLoadingMenu: Boolean = false,
     isMenuError: Boolean = false,
     menuItems: List<MenuItem>? = null,
@@ -313,7 +359,10 @@ private fun RestaurantMenu(
                     ) { page ->
                         val category = categories[page]
                         val items = groupedItems[category] ?: emptyList()
-                        LazyColumn(modifier = Modifier.fillMaxSize()) {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            state = listState
+                        ) {
                             items(items, key = { it.id }) { item ->
                                 MenuItemRow(item = item)
                             }

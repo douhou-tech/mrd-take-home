@@ -95,20 +95,20 @@ fun RestaurantDiscoveryScreen(
             }
         }
     }
-    var previousHideFilters by remember { mutableStateOf(false) }
-    val shouldShowFilters by remember {
+    var previousShowFilters by remember { mutableStateOf(true) }
+    val showFilters by remember {
         derivedStateOf {
             if (listState.isScrollInProgress) {
                 when {
-                    listState.lastScrolledForward -> true
-                    else -> false
+                    listState.lastScrolledForward -> false
+                    else -> true
                 }
             } else {
-                previousHideFilters
+                previousShowFilters
             }
         }
     }
-    previousHideFilters = shouldShowFilters
+    previousShowFilters = showFilters
 
     LaunchedEffect(shouldLoadMore) {
         if (shouldLoadMore) viewModel.onIntent(RestaurantDiscoveryIntent.LoadMore)
@@ -124,7 +124,7 @@ fun RestaurantDiscoveryScreen(
                 .fillMaxSize()
                 .clipToBounds()
         ) {
-            AnimatedVisibility(!shouldShowFilters) {
+            AnimatedVisibility(showFilters) {
                 RestaurantFilterSection(
                     isOpenNow = filterState.isOpenNow,
                     totalCount = filterState.totalCount,
@@ -158,7 +158,7 @@ fun RestaurantDiscoveryScreen(
 
         RestaurantSearchContent(
             query = filterState.query,
-            showSearch = !shouldShowFilters,
+            showSearch = showFilters,
             onQueryChanged = {
                 viewModel.onIntent(RestaurantDiscoveryIntent.SearchQueryChanged(it))
             }
