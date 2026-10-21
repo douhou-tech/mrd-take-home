@@ -11,6 +11,7 @@ import kotlinx.coroutines.delay
 import kotlinx.serialization.json.Json
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.random.Random
 import kotlin.time.Duration.Companion.milliseconds
 
 interface RemoteRestaurantsDataSource {
@@ -94,12 +95,14 @@ internal class MockRemoteRestaurantsDataSource(
     }
 
     override suspend fun getRestaurant(id: String): RestaurantRemoteModel? {
-        delay(2000L.milliseconds)
+        networkDelay()
+        tryFakeException()
         return allRestaurants.firstOrNull { it.id == id }
     }
 
     override suspend fun getRestaurantDetails(id: String): RestaurantDetailsRemoteModel? {
-        delay(2000L.milliseconds)
+        networkDelay()
+        tryFakeException()
         val details = allRestaurantDetails.firstOrNull { it.id == id } ?: return null
 //        val meta = allRestaurantDetailsMeta[id] ?: return null
         return details
@@ -107,5 +110,17 @@ internal class MockRemoteRestaurantsDataSource(
 
     override suspend fun setFavourite(restaurantId: String, favourite: Boolean) {
         favouriteMap[restaurantId] = favourite
+    }
+
+    private suspend fun networkDelay() {
+        val delay = Random.nextLong(300L, 1200L)
+        delay(delay.milliseconds)
+    }
+
+    private fun tryFakeException() {
+        val chance = Random.nextInt()
+        if (chance % 5 == 0) {
+            throw Exception("Fake exception")
+        }
     }
 }
