@@ -61,6 +61,7 @@ import com.mrd.restaurant.discovery.feature.ui.component.RestaurantClosedOverlay
 import com.mrd.restaurant.discovery.ui.Dimens
 import com.mrd.restaurant.discovery.ui.component.FavouriteIconButton
 import com.mrd.restaurant.discovery.ui.component.KeyboardVisibleContentMask
+import com.mrd.restaurant.discovery.ui.component.MrDRetryContent
 import com.mrd.restaurant.discovery.ui.component.MrDScreenLoader
 import com.mrd.restaurant.discovery.ui.component.RemoteImage
 import com.mrd.restaurant.discovery.ui.container.MrDScreenScaffold
@@ -137,7 +138,12 @@ fun RestaurantDiscoveryScreen(
             Box(modifier = Modifier.fillMaxSize()) {
                 when (val state = uiState) {
                     is RestaurantDiscoveryUiState.Empty -> EmptyResultsContent()
-                    is RestaurantDiscoveryUiState.Error -> ErrorResultsContent(message = state.message)
+                    is RestaurantDiscoveryUiState.Error -> ErrorResultsContent(
+                        message = state.message,
+                        onRetry = {
+                            viewModel.onIntent(RestaurantDiscoveryIntent.Retry)
+                        }
+                    )
                     is RestaurantDiscoveryUiState.Success -> RestaurantDiscoveryContent(
                         listState = listState,
                         sharedTransitionScope = sharedTransitionScope,
@@ -273,10 +279,14 @@ private fun EmptyResultsContent() {
 }
 
 @Composable
-private fun ErrorResultsContent(message: String) {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(stringResource(R.string.restaurant_discovery_error, message))
-    }
+private fun ErrorResultsContent(
+    message: String,
+    onRetry: () -> Unit
+) {
+    MrDRetryContent(
+        message = stringResource(R.string.restaurant_discovery_error, message),
+        onRetry = onRetry
+    )
 }
 
 @Composable

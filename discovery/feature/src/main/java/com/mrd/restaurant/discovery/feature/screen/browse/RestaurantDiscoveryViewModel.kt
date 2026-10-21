@@ -113,11 +113,25 @@ class RestaurantDiscoveryViewModel(
             is RestaurantDiscoveryIntent.ToggleOpenNow -> onToggleOpenNow(intent.isOpenNow)
             is RestaurantDiscoveryIntent.ToggleFavourite -> onToggleFavourite(intent.restaurant)
             RestaurantDiscoveryIntent.LoadMore -> onLoadMore()
+            RestaurantDiscoveryIntent.Retry -> onRetry()
+        }
+    }
+
+    private fun onRetry() {
+        if (_uiState.value is RestaurantDiscoveryUiState.Error) {
+            loadRestaurants()
         }
     }
 
     private fun onNavigateToDetails(restaurant: Restaurant) {
-        navigator.navigateTo(FeatureNavKey.RestaurantDetails.ByData(restaurant))
+        val state = _uiState.value
+        val isFavourite = if (state is RestaurantDiscoveryUiState.Success) {
+            state.favourites.contains(restaurant.id)
+        } else {
+            restaurant.favourite
+        }
+        val updatedRestaurant = restaurant.copy(favourite = isFavourite)
+        navigator.navigateTo(FeatureNavKey.RestaurantDetails.ByData(updatedRestaurant))
     }
 
     private fun onSearchQueryChange(query: String) {
@@ -240,6 +254,7 @@ sealed interface RestaurantDiscoveryIntent {
     data class ToggleOpenNow(val isOpenNow: Boolean) : RestaurantDiscoveryIntent
     data class ToggleFavourite(val restaurant: Restaurant) : RestaurantDiscoveryIntent
     data object LoadMore : RestaurantDiscoveryIntent
+    data object Retry : RestaurantDiscoveryIntent
 }
 
 data class RestaurantDiscoveryFilterState(

@@ -28,16 +28,19 @@ class RestaurantDetailsViewModel(
     val uiState: StateFlow<RestaurantDetailsUiState> = _uiState
 
     val restaurantId: String
+    private var currentFavourites: Set<String>? = null
 
     init {
         setupFavouritesChangeFlow()
         when (params) {
             is Params.ByData -> {
                 restaurantId = params.restaurant.id
+                val favourite = currentFavourites?.contains(restaurantId) ?: params.restaurant.favourite
                 _uiState.update {
                     RestaurantDetailsUiState.Success(
                         data = RestaurantDetailsData(
-                            restaurant = params.restaurant
+                            restaurant = params.restaurant,
+                            favourite = favourite
                         )
                     )
                 }
@@ -54,16 +57,24 @@ class RestaurantDetailsViewModel(
         viewModelScope.launch {
             favouriteRestaurantDelegate.favourites
                 .collect { favourites ->
+                    currentFavourites = favourites
                     val favourite = favourites.contains(restaurantId)
                     _uiState.update { state ->
-                        if (state !is RestaurantDetailsUiState.Success) state
-                        else {
-                            state.copy(
-                                data = state.data.copy(favourite = favourite)
-                            )
-                        }
+                        updateStateWithFavourite(state, favourite)
                     }
                 }
+        }
+    }
+
+    private fun updateStateWithFavourite(
+        state: RestaurantDetailsUiState,
+        isFavourite: Boolean
+    ): RestaurantDetailsUiState {
+        return when (state) {
+            is RestaurantDetailsUiState.Success -> state.copy(data = state.data.copy(favourite = isFavourite))
+            is RestaurantDetailsUiState.LoadingMenu -> state.copy(data = state.data.copy(favourite = isFavourite))
+            is RestaurantDetailsUiState.MenuError -> state.copy(data = state.data.copy(favourite = isFavourite))
+            else -> state
         }
     }
 
@@ -81,7 +92,7 @@ class RestaurantDetailsViewModel(
 
     private fun onToggleFavourite() {
         val state = _uiState.value
-        if (state !is RestaurantDetailsUiState.Success) return
+        if (state !is RestaurantDetailsUiState.PartialDataState) return
 
         favouriteRestaurantDelegate.toggleFavourite(
             restaurantId = restaurantId
@@ -101,11 +112,13 @@ class RestaurantDetailsViewModel(
             _uiState.update { RestaurantDetailsUiState.Loading }
 
             val (restaurant, menuItems) = loadRestaurantAsync()
+            val favourite = restaurant?.let { currentFavourites?.contains(it.id) ?: it.favourite } ?: false
             val state = when {
                 restaurant != null && menuItems != null -> {
                     RestaurantDetailsUiState.Success(
                         data = RestaurantDetailsData(
                             restaurant = restaurant,
+                            favourite = favourite,
                             menuItems = menuItems
                         )
                     )
@@ -113,7 +126,8 @@ class RestaurantDetailsViewModel(
                 restaurant != null -> {
                     RestaurantDetailsUiState.MenuError(
                         data = RestaurantDetailsData(
-                            restaurant = restaurant
+                            restaurant = restaurant,
+                            favourite = favourite
                         ),
                         message = "Failed to load menu items"
                     )
@@ -165,18 +179,20 @@ class RestaurantDetailsViewModel(
         viewModelScope.launch {
             when (val menuItemsResult = fetchMenuItemsByRestaurantIdUseCase(restaurantId)) {
                 is EitherResult.Success -> {
-                    _uiState.update {
+                    _uiState.update { currentState ->
+                        val currentData = (currentState as? RestaurantDetailsUiState.PartialDataState)?.data ?: state.data
                         RestaurantDetailsUiState.Success(
-                            data = state.data.copy(
+                            data = currentData.copy(
                                 menuItems = menuItemsResult.data
                             )
                         )
                     }
                 }
                 is EitherResult.Error -> {
-                    _uiState.update {
+                    _uiState.update { currentState ->
+                        val currentData = (currentState as? RestaurantDetailsUiState.PartialDataState)?.data ?: state.data
                         RestaurantDetailsUiState.MenuError(
-                            data = state.data,
+                            data = currentData,
                             message = "Failed to load menu items"
                         )
                     }
