@@ -82,7 +82,7 @@ val restaurantDiscoveryFeatureModule = module {
         val matchers = schemes.map { scheme ->
             UriDeepLinkMatcher(
                 uriPattern = DeepLinkUri("${scheme}://${urlWithoutScheme}"),
-                serializer = serializer<FeatureNavKey.RestaurantDetails.ById>()
+                serializer = FeatureNavKey.RestaurantDetails.ById.serializer()
             )
         }.map { matcher ->
             matcher.withBackStack { matchResult ->

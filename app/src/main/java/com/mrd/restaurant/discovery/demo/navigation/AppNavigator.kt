@@ -36,15 +36,20 @@ internal class AppNavigator(
             val matchResult = deepLinkMatchers.firstNotNullOfOrNull { matcher ->
                 matcher.match(request)
             } ?: return
-            if (matchResult is BackStackMatchResult<*, *>) {
+            val stack = if (matchResult is BackStackMatchResult<*, *>) {
                 @Suppress("UNCHECKED_CAST")
-                val resolvedStack = matchResult.backStack as List<NavKey>
-                backStack.clear()
-                backStack.addAll(resolvedStack)
+                matchResult.backStack as List<NavKey>
             } else {
-                backStack.clear()
-                backStack.add(FeatureNavKey.RestaurantDiscovery)
+                val key = matchResult.key
+                if (key != FeatureNavKey.RestaurantDiscovery) {
+                    listOf(FeatureNavKey.RestaurantDiscovery, key)
+                } else {
+                    listOf(FeatureNavKey.RestaurantDiscovery)
+                }
             }
+
+            backStack.clear()
+            backStack.addAll(stack)
         } catch (ex: Exception) {
             logger.error("Failed to handle deep link to: $uri", ex)
         }

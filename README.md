@@ -101,18 +101,18 @@ Each flavor supports `debug` and `release` build types (e.g., `devDebug`, `stagi
 
 ## 🔗 Deep Linking
 
-The app supports deep linking directly into the **Restaurant Details** screen for a given restaurant ID, preserving navigation back-stack to the **Restaurant Discovery** screen.
+The app supports deep linking directly into the **Restaurant Details** screen for a given restaurant ID, constructing a back-stack so that pressing **Back** returns to the **Restaurant Discovery** screen.
 
 ### Deep Link Format
 
-- **URL Pattern**: `https://staging.mrd.likeabite.com/restaurant/details/{restaurantId}` or `http://staging.mrd.likeabite.com/restaurant/details/{restaurantId}`
+- **Strict URL Pattern**: `https://staging.mrd.likeabite.com/restaurant/details/{restaurantId}` or `http://staging.mrd.likeabite.com/restaurant/details/{restaurantId}`
 - **Example Restaurant ID**: `cpt-cbd-003` (Clarke's Bar & Dining Room)
 
 ### Testing Deep Links via ADB
 
-Ensure the app is installed on your running emulator or connected device, then run the corresponding `adb` command based on your installed build flavor:
+Ensure the app is installed on your running emulator or connected device, then run the ADB command matching your installed build flavor:
 
-#### 1. Dev Flavor (`devDebug`):
+#### 1. Dev Flavor (`devDebug` - Default):
 ```bash
 adb shell am start -W -a android.intent.action.VIEW -d "https://staging.mrd.likeabite.com/restaurant/details/cpt-cbd-003" com.mrd.restaurant.discovery.demo.dev
 ```
@@ -127,13 +127,13 @@ adb shell am start -W -a android.intent.action.VIEW -d "https://staging.mrd.like
 adb shell am start -W -a android.intent.action.VIEW -d "https://staging.mrd.likeabite.com/restaurant/details/cpt-cbd-003" com.mrd.restaurant.discovery.demo
 ```
 
-#### Generic Intent Trigger (No Package Specified):
+#### 4. Generic Intent (System Picker):
 ```bash
 adb shell am start -a android.intent.action.VIEW -d "https://staging.mrd.likeabite.com/restaurant/details/cpt-cbd-003"
 ```
 
 ### Expected Behavior
-Executing the deep link command will immediately launch the app directly into the **Restaurant Details** screen for restaurant `cpt-cbd-003`. Pressing the system or top bar **Back** button will navigate smoothly back to the **Restaurant Discovery** screen.
+Executing any of the above commands will launch the app directly into the **Restaurant Details** screen for restaurant `cpt-cbd-003`. Tapping the back button will return directly to the **Restaurant Discovery** screen.
 
 ---
 
