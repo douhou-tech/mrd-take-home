@@ -13,7 +13,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.TakeHomeDemo">
+        android:theme="@style/Theme.LikeABite">
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -21,7 +21,7 @@
             android:windowSoftInputMode="adjustNothing"
             android:configChanges="keyboard|screenLayout|layoutDirection|orientation|screenSize"
             android:label="@string/app_name"
-            android:theme="@style/Theme.TakeHomeDemo">
+            android:theme="@style/Theme.LikeABite">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -34,7 +34,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="http" />
                 <data android:scheme="https" />
-                <data android:host="staging.takehome.mrd.klc.com" />
+                <data android:host="staging.likeabite.mrd.com" />
                 <data android:pathPrefix="/restaurant/details/" />
             </intent-filter>
 
@@ -43,7 +43,7 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="takehome" />
+                <data android:scheme="likeabite" />
             </intent-filter>
 
         </activity>

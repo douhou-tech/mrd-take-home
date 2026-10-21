@@ -22,7 +22,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "TakeHomeDemo"
+rootProject.name = "LikeABiteDemo"
 includeBuild("build-logic")
 include(":app")
 include(":discovery:core:primitives")

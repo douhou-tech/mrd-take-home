@@ -12,20 +12,26 @@ class AndroidBuildEnvironmentsConventionPlugin : Plugin<Project> {
 
             if (hasApp) {
                 extensions.configure<ApplicationExtension> {
+                    buildFeatures {
+                        resValues = true
+                    }
                     flavorDimensions += "environment"
                     productFlavors {
                         create("dev") {
                             dimension = "environment"
                             applicationIdSuffix = ".dev"
                             versionNameSuffix = "-dev"
+                            resValue("string", "app_name", "\"LikeABite (dev)\"")
                         }
                         create("staging") {
                             dimension = "environment"
                             applicationIdSuffix = ".staging"
                             versionNameSuffix = "-staging"
+                            resValue("string", "app_name", "\"LikeABite (staging)\"")
                         }
                         create("prod") {
                             dimension = "environment"
+                            resValue("string", "app_name", "\"LikeABite (prod)\"")
                         }
                     }
                 }

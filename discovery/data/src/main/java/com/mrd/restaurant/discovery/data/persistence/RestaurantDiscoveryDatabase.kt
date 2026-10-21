@@ -6,7 +6,7 @@ import com.mrd.restaurant.discovery.data.persistence.dao.RestaurantDao
 import com.mrd.restaurant.discovery.data.persistence.model.MenuItemEntity
 import com.mrd.restaurant.discovery.data.persistence.model.RestaurantEntity
 
-@Database(entities = [RestaurantEntity::class, MenuItemEntity::class], version = 1)
+@Database(entities = [RestaurantEntity::class, MenuItemEntity::class], version = 2)
 abstract class RestaurantDiscoveryDatabase : RoomDatabase() {
 
     abstract fun restaurantDao(): RestaurantDao

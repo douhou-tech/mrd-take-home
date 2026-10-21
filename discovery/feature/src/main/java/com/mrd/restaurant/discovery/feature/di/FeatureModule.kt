@@ -77,7 +77,7 @@ val restaurantDiscoveryFeatureModule = module {
     }
 
     single<DeepLinkMatcher<NavKey, *>>(named(FeatureModuleQualifiers.RESTAURANT_DETAILS_DEEPLINK_MATCHER)) {
-        val urlWithoutScheme = "staging.takehome.mrd.klc.com/restaurant/details/{restaurantId}"
+        val urlWithoutScheme = "staging.mrd.likeabite.com/restaurant/details/{restaurantId}"
         val schemes = listOf("http", "https")
         val matchers = schemes.map { scheme ->
             UriDeepLinkMatcher(

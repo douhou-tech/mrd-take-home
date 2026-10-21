@@ -18,7 +18,9 @@ val restaurantDiscoveryDataModule = module {
             androidContext(),
             RestaurantDiscoveryDatabase::class.java,
             "restaurant_discovery.db",
-        ).build()
+        )
+            .fallbackToDestructiveMigration(dropAllTables = true) // TODO remove for prod, instead use migrations
+            .build()
     }
     single { get<RestaurantDiscoveryDatabase>().restaurantDao() }
     single<LocalRestaurantsDataSource> {
