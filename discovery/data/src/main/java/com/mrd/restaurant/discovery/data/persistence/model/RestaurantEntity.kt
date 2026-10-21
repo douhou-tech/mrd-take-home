@@ -11,7 +11,7 @@ data class RestaurantEntity(
     val location: String = "",
     val cuisines: String = "",
     val rating: Double = 0.0,
-    val deliveryFeeInCents: Double = 0.0,
+    val deliveryFeeInCents: Int = 0,
     val etaMinutes: Int = 0,
     val isOpen: Boolean = false,
     val imageUrl: String = "",

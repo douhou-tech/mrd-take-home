@@ -14,7 +14,7 @@ class RestaurantsMapperTest {
             name = "Eastern Food Bazaar",
             cuisines = "Indian, Asian",
             rating = 4.5,
-            deliveryFeeInCents = 1500.0,
+            deliveryFeeInCents = 1500,
             etaMinutes = 25,
             isOpen = true,
             imageUrl = "https://images.unsplash.com"

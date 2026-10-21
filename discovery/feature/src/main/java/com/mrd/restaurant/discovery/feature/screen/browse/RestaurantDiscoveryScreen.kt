@@ -373,6 +373,10 @@ private fun RestaurantItem(
                 text = stringResource(R.string.restaurant_discovery_rating_eta, restaurant.rating, restaurant.etaMinutes),
                 style = MaterialTheme.typography.bodySmall
             )
+            Text(
+                text = stringResource(R.string.restaurant_delivery_fee, restaurant.formattedDeliveryFee()),
+                style = MaterialTheme.typography.bodySmall
+            )
         }
 
         AnimatedVisibility(

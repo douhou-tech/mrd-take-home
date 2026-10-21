@@ -29,6 +29,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
@@ -275,6 +276,11 @@ private fun RestaurantDetailsContent(
                             DescriptionTextItem(
                                 icon = Icons.Default.DateRange,
                                 text = stringResource(R.string.restaurant_eta_mins, restaurant.etaMinutes)
+                            )
+                            Spacer(modifier = Modifier.height(Dimens.SpacingSmall))
+                            DescriptionTextItem(
+                                icon = Icons.Default.ShoppingCart,
+                                text = stringResource(R.string.restaurant_delivery_fee, restaurant.formattedDeliveryFee())
                             )
                             Spacer(modifier = Modifier.height(Dimens.SpacingSmall))
                             Text(

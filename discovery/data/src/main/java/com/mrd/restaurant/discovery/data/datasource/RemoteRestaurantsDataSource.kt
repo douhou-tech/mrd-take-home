@@ -1,5 +1,6 @@
 package com.mrd.restaurant.discovery.data.datasource
 
+import androidx.annotation.VisibleForTesting
 import com.mrd.restaurant.discovery.core.primitive.model.PagedResult
 import com.mrd.restaurant.discovery.core.primitive.model.Pagination
 import com.mrd.restaurant.discovery.data.remote.model.RestaurantDetailsMetaRemoteModel
@@ -27,6 +28,7 @@ interface RemoteRestaurantsDataSource {
     suspend fun setFavourite(restaurantId: String, favourite: Boolean)
 }
 
+// TODO replace with real API implementation
 internal class MockRemoteRestaurantsDataSource(
     val restaurantsJson: String,
     val restaurantDetailsJson: String = "[]",
@@ -112,12 +114,14 @@ internal class MockRemoteRestaurantsDataSource(
         favouriteMap[restaurantId] = favourite
     }
 
-    private suspend fun networkDelay() {
+    @VisibleForTesting
+    suspend fun networkDelay() {
         val delay = Random.nextLong(300L, 1200L)
         delay(delay.milliseconds)
     }
 
-    private fun tryFakeException() {
+    @VisibleForTesting
+    fun tryFakeException() {
         val chance = Random.nextInt()
         if (chance % 5 == 0) {
             throw Exception("Fake exception")

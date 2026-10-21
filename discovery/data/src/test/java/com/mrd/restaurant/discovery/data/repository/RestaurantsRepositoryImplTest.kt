@@ -4,6 +4,7 @@ import com.mrd.restaurant.discovery.domain.repository.RestaurantFilters
 import com.mrd.restaurant.discovery.core.primitive.model.Pagination
 import com.mrd.restaurant.discovery.data.datasource.LocalRestaurantsDataSource
 import com.mrd.restaurant.discovery.data.datasource.RemoteRestaurantsDataSource
+import com.mrd.restaurant.discovery.data.remote.model.RestaurantDetailsRemoteModel
 import com.mrd.test.randomString
 import io.mockk.coVerify
 import io.mockk.coVerifyOrder
@@ -39,10 +40,9 @@ class RestaurantsRepositoryImplTest {
     fun `when getRestaurant then call remote first, persist locally, and get from local`() = runTest {
         val id = randomString(10)
         
-        val details = mockk<com.mrd.restaurant.discovery.data.remote.model.RestaurantDetailsRemoteModel>(relaxed = true)
-        val meta = mockk<com.mrd.restaurant.discovery.data.remote.model.RestaurantDetailsMetaRemoteModel>(relaxed = true)
-        
-        io.mockk.coEvery { remoteDataSource.getRestaurantDetails(any()) } returns Pair(details, meta)
+        val details = mockk<RestaurantDetailsRemoteModel>(relaxed = true)
+
+        io.mockk.coEvery { remoteDataSource.getRestaurantDetails(any()) } returns details
 
         subject.getRestaurant(id)
 

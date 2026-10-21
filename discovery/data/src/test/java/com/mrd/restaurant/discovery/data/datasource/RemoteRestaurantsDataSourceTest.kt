@@ -10,16 +10,26 @@ import io.kotest.matchers.equals.shouldEqual
 import io.kotest.matchers.equals.shouldNotEqual
 import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
+import io.mockk.coEvery
+import io.mockk.every
+import io.mockk.spyk
 import kotlinx.coroutines.test.runTest
+import org.junit.Before
 import org.junit.Test
 
 class RemoteRestaurantsDataSourceTest {
 
-    private val subject: RemoteRestaurantsDataSource = MockRemoteRestaurantsDataSource(
+    private val subject = spyk(MockRemoteRestaurantsDataSource(
         restaurantsJson = loadRestaurantsJson(),
         restaurantDetailsJson = loadRestaurantDetailsJson(),
         restaurantDetailsMetaJson = loadRestaurantDetailsMetaJson()
-    )
+    ))
+
+    @Before
+    fun setup() {
+        coEvery { subject.networkDelay() } returns Unit
+        every { subject.tryFakeException() } returns Unit
+    }
 
     @Test
     fun `when getRestaurants without filters then return 100 Cape Town CBD restaurants paginated`() = runTest {
@@ -120,8 +130,7 @@ class RemoteRestaurantsDataSourceTest {
         val result = subject.getRestaurantDetails(id)
 
         result shouldNotEqual null
-        result?.first?.id shouldEqual id
-        result?.second shouldNotEqual null
+        result?.id shouldEqual id
     }
 
     @Test

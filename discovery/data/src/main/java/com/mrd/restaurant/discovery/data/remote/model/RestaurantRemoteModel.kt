@@ -10,7 +10,7 @@ data class RestaurantRemoteModel(
     @SerialName("location") val location: String = "",
     @SerialName("cuisines") val cuisines: String = "",
     @SerialName("rating") val rating: Double = 0.0,
-    @SerialName("delivery_fee_in_cents") val deliveryFeeInCents: Double = 0.0,
+    @SerialName("delivery_fee_in_cents") val deliveryFeeInCents: Int = 0,
     @SerialName("eta_minutes") val etaMinutes: Int = 0,
     @SerialName("is_open") val isOpen: Boolean = false,
     @SerialName("image_url") val imageUrl: String = "",

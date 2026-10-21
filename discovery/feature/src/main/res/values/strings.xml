@@ -10,5 +10,6 @@
     <string name="restaurant_discovery_error">Error: %1$s</string>
     <string name="restaurant_discovery_search_placeholder">Search restaurants</string>
     <string name="restaurant_discovery_rating_eta">Rating: %1$s ⭐ | ETA: %2$d mins</string>
+    <string name="restaurant_delivery_fee">Delivery: %1$s</string>
     <string name="restaurant_closed">Closed</string>
 </resources>
