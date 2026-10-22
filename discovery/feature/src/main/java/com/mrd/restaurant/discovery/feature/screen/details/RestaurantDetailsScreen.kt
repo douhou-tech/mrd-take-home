@@ -232,7 +232,8 @@ private fun RestaurantDetailsContent(
                                             sharedTransitionScope.rememberSharedContentState(key = restaurant.id),
                                             animatedVisibilityScope = visibilityScope,
                                         ),
-                                        imageUrl = restaurant.imageUrl
+                                        imageUrl = restaurant.imageUrl,
+                                        fallbackImage = R.drawable.restaurant_image_error_placeholder
                                     )
                                 }
 

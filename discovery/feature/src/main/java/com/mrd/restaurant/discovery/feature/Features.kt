@@ -2,9 +2,13 @@ package com.mrd.restaurant.discovery.feature
 
 import coil3.ImageLoader
 import coil3.SingletonImageLoader
+import coil3.annotation.ExperimentalCoilApi
 import coil3.disk.DiskCache
 import coil3.memory.MemoryCache
+import coil3.network.ktor3.KtorNetworkFetcherFactory
 import coil3.util.DebugLogger
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.HttpTimeout
 import okio.Path.Companion.toOkioPath
 
 
@@ -32,14 +36,26 @@ object Features {
             )
         }
 
+        @OptIn(ExperimentalCoilApi::class)
         fun init(configure: (Config.Builder.() -> Unit)? = null) {
             val builder = Config.Builder()
             configure?.invoke(builder)
             val config = builder.build()
 
+            val client = HttpClient {
+                install(HttpTimeout) {
+                    requestTimeoutMillis = 10_000L
+                    connectTimeoutMillis = 10_000L
+                    socketTimeoutMillis = 10_000L
+                }
+            }
+
             SingletonImageLoader.setSafe { ctx ->
                 with(config.imageLoading) {
                     ImageLoader.Builder(ctx)
+                        .components {
+                            add(KtorNetworkFetcherFactory(httpClient = client))
+                        }
                         .memoryCache {
                             MemoryCache.Builder()
                                 .maxSizePercent(ctx, memoryCachePercent)

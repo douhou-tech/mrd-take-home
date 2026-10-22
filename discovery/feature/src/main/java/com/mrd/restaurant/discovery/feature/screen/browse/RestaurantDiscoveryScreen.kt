@@ -373,7 +373,8 @@ private fun RestaurantItem(
                                 )
                             )
                             .padding(bottom = Dimens.SpacingSmall),
-                        imageUrl = restaurant.imageUrl
+                        imageUrl = restaurant.imageUrl,
+                        fallbackImage = R.drawable.restaurant_image_error_placeholder
                     )
                 }
 
